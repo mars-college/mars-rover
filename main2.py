@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+
+#via https://stackoverflow.com/questions/59858898/how-to-convert-a-video-on-disk-to-a-rtsp-stream
+
+
 import cv2
 import gi
 import sys
@@ -34,18 +39,19 @@ class SensorFactory(GstRtspServer.RTSPMediaFactory):
     def __init__(self, **properties):
         super(SensorFactory, self).__init__(**properties)
         self.cap = cv2.VideoCapture(0)
-        #self.cap = cv2.VideoCapture("shmsrc socket-path=/tmp/foo2 ! video/x-raw, format=BGR ,width=1920,height=1080,framerate=30/1 ! videoconvert ! video/x-raw, format=BGR ! appsink")
+        #self.cap = cv2.VideoCapture("shmsrc socket-path=/tmp/foo2 ! video/x-raw, format=BGR ,width=1920,height=1080,framerate=30/1 ! videoconvert #! video/x-raw, format=BGR ! appsink")
         #self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         #self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.width, self.height = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH), self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         self.number_frames = 0
         self.fps = 30.0
         self.duration = 1 / self.fps * Gst.SECOND  # duration of a frame in nanoseconds
-        self.launch_string = 'appsrc name=source is-live=true block=true format=GST_FORMAT_TIME ' \
-                             'caps=video/x-raw,format=BGR,width=%d,height=%d,framerate=%d/1 '%(self.width, self.height, int(self.fps)) \
-                             '! videoconvert ! video/x-raw,format=I420 ' \
-                             '! x264enc speed-preset=ultrafast tune=zerolatency threads=4 ' \
-                             '! rtph264pay config-interval=1 name=pay0 pt=96'
+        # self.launch_string = 'appsrc name=source is-live=true block=true format=GST_FORMAT_TIME ' \
+        #                      ('caps=video/x-raw,format=BGR,width=%d,height=%d,framerate=%d/1 '% (self.width, self.height, int(self.fps))) \
+        #                      '! videoconvert ! video/x-raw,format=I420 ' \
+        #                      '! x264enc speed-preset=ultrafast tune=zerolatency threads=4 ' \
+        #                      '! rtph264pay config-interval=1 name=pay0 pt=96'
+        self.launch_string = 'appsrc name=source is-live=true block=true format=GST_FORMAT_TIME caps=video/x-raw,format=BGR,width=%d,height=%d,framerate=%d/1 ! videoconvert ! video/x-raw,format=I420 ! x264enc speed-preset=ultrafast tune=zerolatency threads=4 ! x264enc speed-preset=ultrafast tune=zerolatency threads=4 ! rtph264pay config-interval=1 name=pay0 pt=96'   % (self.width, self.height, int(self.fps)) 
 
     def on_need_data(self, src, length):
         if self.cap.isOpened():
@@ -83,7 +89,7 @@ class GstServer(GstRtspServer.RTSPServer):
         super(GstServer, self).__init__(**properties)
         self.factory = SensorFactory()
         self.factory.set_shared(True)
-        self.get_mount_points().add_factory("/test", self.factory)
+        self.get_mount_points().add_factory("/stream1", self.factory)
         self.attach(None)
 
 
