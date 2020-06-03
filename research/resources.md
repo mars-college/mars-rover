@@ -62,6 +62,7 @@ Notes: fan is a pain to install
 Notes: Untested and TBH poorly researched. An alternative camera to test would be this: [SainSmart IMX219 Camera Module for NVIDIA Jetson Nano Board & Raspberry PI CM3 8MP Sensor 200 Degree FoV ](https://www.amazon.com/SainSmart-IMX219-Camera-Module-Raspberry/dp/B07WR87J2W/)
 
 * [SainSmart New Noir Camera Module FOV 175 Wide Angle Lens for Raspberry Pi-3 Pi-2 Model A B](https://www.amazon.com/gp/product/B075WT43CC/)
+	* Drivers: [OmniVision OV5647 Linux driver for Jetson Nano](https://developer.ridgerun.com/wiki/index.php?title=OmniVision_OV5647_Linux_driver_for_Jetson_Nano)
 
 Resources:
 
