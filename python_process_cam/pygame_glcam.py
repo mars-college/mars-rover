@@ -11,7 +11,7 @@ import cv2
 
 from PIL import Image
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2)
 
 
 
@@ -55,10 +55,10 @@ def init():
     vertices = numpy.array(vertices, dtype=numpy.float32)
     texcoords = numpy.array(texcoords, dtype=numpy.float32)
 
-    vertexShader = compileShader(getFileContent("helloTriangle.vert"), GL_VERTEX_SHADER)
-    fragmentShader = compileShader(getFileContent("helloTriangle.frag"), GL_FRAGMENT_SHADER)
-    #vertexShader = compileShader(getFileContent("equirectanguler.vert"), GL_VERTEX_SHADER)
-    #fragmentShader = compileShader(getFileContent("equirectanguler.frag"), GL_FRAGMENT_SHADER)
+    #vertexShader = compileShader(getFileContent("helloTriangle.vert"), GL_VERTEX_SHADER)
+    #fragmentShader = compileShader(getFileContent("helloTriangle.frag"), GL_FRAGMENT_SHADER)
+    vertexShader = compileShader(getFileContent("equirectanguler.vert"), GL_VERTEX_SHADER)
+    fragmentShader = compileShader(getFileContent("equirectanguler.frag"), GL_FRAGMENT_SHADER)
 
     global shaderProgram
     shaderProgram = glCreateProgram()
