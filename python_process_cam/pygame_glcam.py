@@ -14,6 +14,8 @@ from PIL import Image
 cap = cv2.VideoCapture(2)
 
 
+# output to framebuffer to PIL: https://stackoverflow.com/questions/59433403/how-to-save-fragment-shader-image-changes-to-image-output-file
+
 
 def getFileContent(file):
     content = open(file, 'r').read()

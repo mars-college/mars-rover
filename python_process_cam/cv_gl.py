@@ -50,7 +50,7 @@ def idle():
     glTexImage2D(GL_TEXTURE_2D, 
         0, 
         GL_RGB, 
-        1280,720,
+        1280, 720,
         0,
         GL_RGB, 
         GL_UNSIGNED_BYTE, 
