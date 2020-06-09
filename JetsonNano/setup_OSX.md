@@ -98,4 +98,22 @@ Host <pick_an_alias>
         IdentityFile ~/.ssh/id_rsa
 ```
 
-###
+### Helpful Packages
+
+It'll come in handy to install the following packages:
+
+* `apt-utils`
+* `nvidia-jetpack`
+
+## Additional Tips
+
+The Jetson has two power profiles, called modes. Mode 0 is 10W, Mode 1 is 5W. 
+
+* To set the mode to 5 Watt mode: `$ sudo nvpmodel -m 1`
+* To set it back to 10 Watt mode: `$ sudo nvpmodel -m 0`
+
+### `rsynch`
+
+To copy and synchronize files on your local machine with the Nano, use `rsynch`.
+
+* `$ rsync -r <source_path> <user>@<remote>:<destination_path>`
