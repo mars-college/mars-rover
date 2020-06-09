@@ -1,10 +1,9 @@
-#! /usr/bin/python
-
 import os.path
-import tornado.httpserver
-import tornado.websocket
-import tornado.ioloop
-import tornado.web
+import tornado
+# import tornado.httpserver
+# import tornado.websocket
+# import tornado.ioloop
+# import tornado.web
 import RPi.GPIO as GPIO
 
 #Initialize Raspberry PI GPIO
