@@ -94,14 +94,14 @@ function WebIOPi() {
 	head.insertBefore(jquery, scripts[0]);
 	
 	// GA
-	_gaq.push(['_setAccount', 'UA-33979593-2']);
-	_gaq.push(['_trackPageview']);
+	// _gaq.push(['_setAccount', 'UA-33979593-2']);
+	// _gaq.push(['_trackPageview']);
 		
-	var ga = document.createElement('script');
-	ga.type = 'text/javascript';
-	ga.async = false;
-	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	head.insertBefore(ga, scripts[0]);
+	// var ga = document.createElement('script');
+	// ga.type = 'text/javascript';
+	// ga.async = false;
+	// ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	// head.insertBefore(ga, scripts[0]);
 	
 	// init ALTs
 	this.addALT(this.ALT.I2C0, 0, "SDA");

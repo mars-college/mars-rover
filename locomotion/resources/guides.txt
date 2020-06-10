@@ -1,1 +1,0 @@
-https://www.seeedstudio.com/blog/2020/05/27/configure-pwm-output-on-jetson-nano-m/
