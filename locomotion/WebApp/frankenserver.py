@@ -135,21 +135,18 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     print ('[WS] Connection was opened.')
  
   def on_message(self, message):
-    print ('[WS] Incoming message:', message)
+    global left_direction_last
+    global right_direction_last
+    # print ('[WS] Incoming message:', message)
 
-    #-----
-    message = message.split(';')
+    message = message.split(',')
+    # print ('[WS] Incoming message:', message)
 
-    drive = 0.0
-    turn = 0.0
-
-    if message[0] == 'd':
-      drive == int(PWM_RANGE * float([1]))
-
-    if message[0] == 't':
-      turn == int(PWM_RANGE * float([1]))
-
-    left_direction_last, right_direction_last = set_power( drive , turn)
+    if message[0] == 'j':
+      drive = int(PWM_RANGE * float(message[1]))
+      turn = int(PWM_RANGE * float(message[2]))
+      # print("Drive: "+str(drive)+"Turn: "+str(turn))
+      left_direction_last, right_direction_last = set_power( drive , turn)
 
     # if message == "on_g":
     #   GPIO.output(16, True)
