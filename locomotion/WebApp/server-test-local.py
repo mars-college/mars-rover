@@ -18,7 +18,7 @@ PORT = 80
 class MainHandler(tornado.web.RequestHandler):
   def get(self):
      print ("[HTTP](MainHandler) User Connected.")
-     self.render("index2.html")
+     self.render("index.html")
 
 	
 class WSHandler(tornado.websocket.WebSocketHandler):

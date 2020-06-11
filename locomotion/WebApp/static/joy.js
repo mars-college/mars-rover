@@ -270,7 +270,7 @@ var JoyStick = (function(container, parameters)
 	 */
 	this.GetX = function ()
 	{
-		return (100*((movedX - centerX)/maxMoveStick)).toFixed();
+		return (((movedX - centerX)/maxMoveStick));
 	};
 
 	/**
@@ -279,7 +279,7 @@ var JoyStick = (function(container, parameters)
 	 */
 	this.GetY = function ()
 	{
-		return ((100*((movedY - centerY)/maxMoveStick))*-1).toFixed();
+		return ((((movedY - centerY)/maxMoveStick))*-1);
 	};
 	
 	/**

@@ -1,115 +1,153 @@
-<p align="center">
-  <img width="286" height="72" src="http://www.tornadoweb.org/en/stable/_images/tornado.png">
-</p>
+# Javascript Remote Control of Robotic Tank Platform over WebSockets
 
-<h3 align="center">
-  Raspberry Pi WebSocket With Tornado
-</h3>
-<br>
+This walkthrough covers steps to setting up remote control of a Mountain Ark SR-08 robotic tank platform with a Raspberry Pi over WebSockets.
 
-## Task
-Creating a WebSockets to control the GPIO pin of Raspberry Pi using the Tornado framework in Python.
+Hardware setup is not covered in detail.
 
-## Project Apparatus
-### Hardware components:
-* Raspberry Pi 3 Model B  (any pi will be OK though)
-* Breadboard 
-* LED
-* Male/Female Jumper Wires
-* Resistor 221 ohm
+## Assumptions
 
-### Software Components:
-* Raspberry Pi Raspbian OS
-* PUTTY for remotely access
+* Your host system is running OSX, though this should work on  Windows and Linux as well.
+* A basic working knowledge of Linux CLI, Raspberry Pi, Python.
+* You've clones this repository locally.
+* Nice to have but not necessary to know JavaScript, WebSockets, Python, HTML.
+* Experience prototyping electronics enough to know how to setup a breadboard to handle two different voltages.
 
-A clean basic knowledge required of
-* Python 3x
-* HTML , CSS , JavaScript
-* Tornado framework
+## Requirements
 
+To reproduce the project in its entirety, you'll need to have access to an electronics workbench/lab, outfit with a few basic tools in addition to having purchased the necessary hardware.
 
-## Working Steps
+### Tools
 
-We will access our raspberry pi remotely by using Putty which is a SSH and telnet client. First Download [Putty](https://www.putty.org/) and install it on winodws. Connect your Putty to Raspberry Pi so that we can access or navigate pi directory via terminal. Please do a google search if you have trouble for connecting your putty to raspberry pi.
+* Soldering Iron and supplies
+* Wire clippers and strippers
+* Header pins or sockets
+* A breadboard
+* Jumper wires compatible with the breadboard and header pins/sockets
+* Multimeter (for checking voltages and 
+* Oscilloscope for debugging hardware and connections (optional).
 
-After connecting with raspberry pi via putty open a session and proceed to rasbian directory.
+### Hardware
 
-### Pacakge Installation:
-Python is already built-in in Rasbian OS. All we need now is to install [tornado](http://www.tornadoweb.org/en/stable/) package manually. We also need to install the RPi.GPIO package to interact with Rasberry pi GPIO pins with python. Run the following command for gradually for installing all of them properly
+* Raspberry Pi (Zero W used) - configured and ready to go.
+* [TB6612 breakout board from Adafruit](https://www.adafruit.com/product/2448) - [TB6612 Datasheet](resources/TB6612FNG_datasheet_en_20121101.pdf)
+* 2x 3.7V 18650 Li-Ion cells.
+* [4.5-28V to 0.8V-20V DC Buck converter](https://www.amazon.com/gp/product/B01MQGMOKI/)
+* [SR-08 tank platform](https://www.amazon.com/gp/product/B07JPL6MHR/) with included motors.
 
-```shell
-sudo apt-get update && sudo apt-get upgrade
-sudo apt-get install rpi.gpio
-sudo pip install tornado
+### Software
+
+* Raspberry Pi accessible over SSH on a local network
+* Python3
+* pigpio GPIO control application for Raspberry Pi
+* tornado python web server framework
+
+## Hardware Pre-flight
+
+* Make sure your Raspberry Pi is configured to connect to your WiFi network and that you can SSH into it.
+* Assemble the TR-08 tank platform.
+* Determine which voltage rails will carry regulated +5V and which will be connected directly to the LI battery pack.
+* Assemble and connect [TB6612 breakout board](https://www.adafruit.com/product/2448).
+* Solder any necessary connections to allow easy and secure insertion into/onto breadboard or header sockets/pins.
+* The Raspberry Pi used is powered from a Micro USB connection. I've cut and prepared a Micro USB power cable to be inserted into a breadboard.
+
+### Assemble TR-08 Tank Platform
+
+Follow the instructions provided in their [video](https://www.youtube.com/watch?v=wATykzn6Z34).
+
+### Setting up Power Connections
+
+* Charge your LI batteries fully before proceeding.
+
+LI battery cells have an operating range from ~8V - ~6.5V. This needs to be regulated down to 5V for the Raspberry Pi and the TB6612 board. A Buck Converter board is used to achieve this. 
+
+* Do not place batteries into the compartment until you are ready to adjusts the voltage output on the buck converter!
+
+The idea is that you will set your breadboard up with on rail as carrying the direct connection to the LI battery pack and the other will carry the regulated 5V.
+
+The Raspberry Pi is powered over a Micro USB connection. For this project, I cut an existing cable and fitted the wires with header pins for easy insertion into a breadboard.
+
+1. Solder header pins to your [4.5-28V to 0.8V-20V DC Buck converter](https://www.amazon.com/gp/product/B01MQGMOKI/) and insert into breadboard.
+1. Connect the `V+ in` and `GND in` of the Buck Converter to the voltage rails on the side of the breadboard which will connect to the LI batteries.
+1. Connect the `V+ out` and `GND out` of the Buck Converter to the voltage rails on side of the breadboard which will carry the regulated 5V.
+1. Connect the LI battery to the appropriate voltage rail on your breadboard.
+1. Insert fully charged LI cells into the battery compartment.
+1. Using a multimeter and a small screw driver, adjust the output of the buck converter until it reads between +5.0 to 5.1 volts.
+1. Disconnect the LI batteries.
+1. Insert a prepare Micro USB cable into the breadboard (you'll have to cut and solder appropriate connections (like header pins)
+
+### Assemble and Connect TB6612 Breakout
+
+1. Solder header pins and insert into a breadboard.
+1. Use jumpers to connect `GND` pins to the breadboard rail you've setup as common ground.
+1. Connect the `VCC` pin of the breakout board to the breadboard rail you've setup as the `+5V` connection to your LI battery pack. 
+1. Connect the `VM` pin of the breakout board to the breadboard rail you've setup as the `+` connection to your LI battery pack.
+1. Connect the remaining pins using [this diagram](https://pinout.xyz/) as follows:
+
+```
+TB6612		RPi	GPIO	OTHER
+------		--------	-----
+GND			GPIO 34
+PWMA		BCM 12
+PWMB		BCM 13
+AIN1		BCM 4
+AIN2		BCM 17
+BIN1		BCM 27
+BIN2		BCM 22
+MOTORA(1)	--			MOTORA+
+MOTORA(2)	--			MOTORA-
+MOTORB(1)	--			MOTORB+
+MOTORB(2)	--			MOTORB-
+STANDBY		TBD
 ```
 
-### Experimental Setup
-11 , 13 and 16 , 18 are set up Rapberry GPIO Pins and use 39 as our Ground port though you may use any.The set up connection layout ar given below.
+### Install Software on Raspberry Pi
 
-```shell
-GPIO PIN 11  ->  (ve+) RED   LED(ve-)   -> Ground
-GPIO PIN 13  ->  (ve+) BLUE  LED(ve-)   -> Ground
-GPIO PIN 16  ->  (ve+) GRAY  LED(ve-)   -> Ground
-GPIO PIN 18  ->  (ve+) WHITE LED(ve-)   -> Ground 
-```
-Check the connection whether LED get power or not. Create `nano test_led.py` and type following piece of python code there.
+Complete the following steps while connected to the Raspberry Pi over WiFi via ssh. It's recommended that you do this is the Raspberry Pi plugged into a AC adapter instead of the LI battery pack.
 
-```python
+1. `$ sudo apt-get update; sudo apt-get upgrade -y`
+1. `$ sudo apt-get install pigpio pigpiod python3-pigpio`
+1. `$ sudo apt-get install python3-tornado` 
+1. `$ sudo shutdown -h now`
 
-# including pacakges
-import RPi.GPIO as GPIO
-import time
+Disconnect from the AC adapter and connect to the power connector on the platform (Micro USB you inserted into the breadboard)
 
-#Set GPIO pins as outputs
-GPIO.setmode(GPIO.BOARD)
+## Testing WebSockets Locally
 
-# set pin 11 and 13 as Output
-# we only test two pins here
-GPIO.setup(11, GPIO.OUT)
-GPIO.setup(13, GPIO.OUT)
+To test locally on your host, you'll need to make sure that you have tornado installed.
 
-#Switch GPIO pins ON
-GPIO.output(11, True)
-GPIO.output(13, True)
+1. `$ pip3 install tornado`
+1. `$ cd <repository_root_path>/WebApp`
+1. `$ python3 server-test-local.py`
+1. In a web browser with JavaScript and WebSockets enabled, navigate to `http://localhost:80`
+1. Check that the `WebSocket status:` reads `connected`.
+1. Interact with the GUI and check to console for messages received.
 
-#make 5 seconds delay 
-time.sleep(5)
+## Controlling the Robot!
 
-#Switch GPIO pins OFF
-GPIO.output(11, False)
-GPIO.output(13, False)
+You'll need to power the Raspberry Pi from the LI battery pack now and locate the robot to a place where it can move freely but still maintain WiFi connectivity.
 
-#Reset GPIO pins to their default state
-#note : very important
-GPIO.cleanup()
-```
+### Start `pigpiod` on the RPi
 
-Save your file by pressing simultanuely `Cytl + X` and 'Y' to save it , finish with press enter. Now it should create properly. Run the code by giving following command -
+The `pigpio` library runs a separate service that manages communication with the GPIO pins. You need to start the `pigpiod` service first.
 
-`sudo python test_led.py` 
+1. `$ sudo pigpio`
+2. 1. `$ cd <repository_root_path>/WebApp`
+1. `$ python3 server.py`
 
-and hit enter. Your led shuld blink for five second.
+Optionally, you can have this start up automatically on boot up.
 
-## Run Project
-First download this repository `git clone https://github.com/iphton/Raspberry-Pi-WebSocket.git` or simply download locally. After download the repo extract it and run the python file as following.
+1. `$ sudo systemctl enable pigpiod`
+1. `$ sudo systemctl restart pigpiod`
 
-`sudo python server.py`
+### Fire up the HTTP server on the RPi
 
-Tornado server will be started shortly.It will short from port 80 as we programmed.
+1. `$ cd <repository_root_path>/WebApp`
+1. `$ python3 server.py`
 
-![puttty](https://user-images.githubusercontent.com/17668390/39704364-eb60172e-51bf-11e8-9f01-dc43f56fe7fb.JPG)
+### Access the control interface on your host machine
 
-Now from your pi browser or from any brower in pc , go folowing -
+1. Make sure you know the IP address of your Raspberry Pi: `$ ifconfig wlan0`
+1. Open a browser on your host (make sure you have JavaScript enabled!) and navigate to: `http://<your_pi_IP_Address>:80`
+1. Check the WebSocket status in the bottom and make sure it reads `connected`. If not, open the WebConsole (Firefox) and look for errors.
 
-> ip_address:80
-
-This ip address is unique and it's basically your raspberry pi ip address and following colon mark 80 is the given port number from where our server will started from our pc. After entering this port following page will be opened.
-
-![connected](https://user-images.githubusercontent.com/17668390/39704460-3b452496-51c0-11e8-927e-62d24d85ed33.JPG)
-
-Now we can control GPIO pin from our brower by making a web socket.
-
----
-Regards
-
-**World of Void**
+The joystick GUI element should now move the robot around!
