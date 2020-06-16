@@ -131,18 +131,21 @@ You'll need to power the Raspberry Pi from the LI battery pack now and locate th
 The `pigpio` library runs a separate service that manages communication with the GPIO pins. You need to start the `pigpiod` service first.
 
 1. `$ sudo pigpio`
-2. 1. `$ cd <repository_root_path>/WebApp`
-1. `$ python3 server.py`
 
 Optionally, you can have this start up automatically on boot up.
 
 1. `$ sudo systemctl enable pigpiod`
 1. `$ sudo systemctl restart pigpiod`
 
+
 ### Fire up the HTTP server on the RPi
 
 1. `$ cd <repository_root_path>/WebApp`
 1. `$ python3 server.py`
+
+Optionally install and manage as a `systemd` service using `install.sh`, `uninstall.sh`, `update.sh` scripts:
+
+1. `$ sudo bash install.sh`
 
 ### Access the control interface on your host machine
 
