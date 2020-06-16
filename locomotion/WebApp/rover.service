@@ -3,7 +3,7 @@ After=network.target pigpiod.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/server.py
+ExecStart=/usr/bin/python3 /usr/local/bin/rover/server.py
 
 [Install]
 WantedBy=multi-user.target

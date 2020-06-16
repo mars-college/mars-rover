@@ -77,8 +77,12 @@ def m2_direction(direction):
 
 def set_power(drive, turn):
 
-  left_power = drive - turn
-  right_power = drive + turn
+  if drive > 0:
+    left_power = drive + turn
+    right_power = drive - turn
+  else:
+    left_power = drive - turn
+    right_power = drive + turn
 
   if left_power >= 0:
     left_direction = True
@@ -127,7 +131,7 @@ PORT = 80
 class MainHandler(tornado.web.RequestHandler):
   def get(self):
      print ("[HTTP](MainHandler) User Connected.")
-     self.render("index2.html")
+     self.render("index.html")
 
 	
 class WSHandler(tornado.websocket.WebSocketHandler):
@@ -188,6 +192,7 @@ if __name__ == "__main__":
         main_loop.start()
 
     except:
+        print ("")
         print ("Exception triggered - Tornado Server stopped.")
         clearOutput()
         GPIO.stop()
