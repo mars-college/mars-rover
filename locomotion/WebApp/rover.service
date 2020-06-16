@@ -1,9 +1,13 @@
+[Unit]
 Description=Mars Rover WebApp Service
-After=network.target pigpiod.service
+After=pigpiod.service
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/python3 /usr/local/bin/rover/server.py
+RestartSec=5
+Restart=always
+TimeoutSec=10
 
 [Install]
 WantedBy=multi-user.target

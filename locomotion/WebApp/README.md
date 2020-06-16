@@ -130,17 +130,20 @@ You'll need to power the Raspberry Pi from the LI battery pack now and locate th
 
 The `pigpio` library runs a separate service that manages communication with the GPIO pins. You need to start the `pigpiod` service first.
 
-1. `$ sudo pigpio`
+1. `$ sudo pigpiod`
 
 Optionally, you can have this start up automatically on boot up.
 
+1. `$ cd <repository_root_path>/locomotion/WebApp`
+1. `$ sudo cp pigpiod.service /etc/systemd/system/`
+1. `$ sudo systemctl daemon-reload`
 1. `$ sudo systemctl enable pigpiod`
-1. `$ sudo systemctl restart pigpiod`
+1. `$ sudo systemctl start pigpiod`
 
 
 ### Fire up the HTTP server on the RPi
 
-1. `$ cd <repository_root_path>/WebApp`
+1. `$ cd <repository_root_path>/locomotion/WebApp`
 1. `$ python3 server.py`
 
 Optionally install and manage as a `systemd` service, `rover.service` using `install.sh`, `uninstall.sh`, `update.sh` scripts:
