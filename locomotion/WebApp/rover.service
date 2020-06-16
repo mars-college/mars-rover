@@ -1,0 +1,9 @@
+Description=Mars Rover WebApp Service
+After=network.target pigpiod.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/server.py
+
+[Install]
+WantedBy=multi-user.target

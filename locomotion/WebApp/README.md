@@ -84,9 +84,9 @@ The Raspberry Pi is powered over a Micro USB connection. For this project, I cut
 1. Connect the remaining pins using [this diagram](https://pinout.xyz/) as follows:
 
 ```
-TB6612		RPi	GPIO	OTHER
+TB6612		RPi GPIO	OTHER
 ------		--------	-----
-GND			GPIO 34
+GND 		GPIO 34
 PWMA		BCM 12
 PWMB		BCM 13
 AIN1		BCM 4
