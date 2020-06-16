@@ -143,9 +143,15 @@ Optionally, you can have this start up automatically on boot up.
 1. `$ cd <repository_root_path>/WebApp`
 1. `$ python3 server.py`
 
-Optionally install and manage as a `systemd` service using `install.sh`, `uninstall.sh`, `update.sh` scripts:
+Optionally install and manage as a `systemd` service, `rover.service` using `install.sh`, `uninstall.sh`, `update.sh` scripts:
 
 1. `$ sudo bash install.sh`
+
+* start the server: `sudo systemctl start rover.service`
+* stop the server: `sudo systemctl stop rover.service`
+* restart the server: `$ sudo systemctl restart rover.service`
+* enable startup on boot: `sudo systemctl enable reover.service`
+* disable startup on boot: `sudo systemctl disable reover.service`
 
 ### Access the control interface on your host machine
 
