@@ -11,9 +11,10 @@ import cv2
 
 from PIL import Image
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
 
+# basic shader + pyopengl: https://stackoverflow.com/questions/53585040/pyopengl-fragment-shader-texture-sampling 
 # output to framebuffer to PIL: https://stackoverflow.com/questions/59433403/how-to-save-fragment-shader-image-changes-to-image-output-file
 
 
@@ -115,6 +116,7 @@ def main():
         glUseProgram(shaderProgram)
         #glUniform1i(texLocation, 0)
         glDrawArrays(GL_QUADS, 0, 4)
+
 
         pygame.display.flip()
 

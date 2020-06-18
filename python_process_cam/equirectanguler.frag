@@ -26,7 +26,13 @@ void main(void)
 
 
     vec2 revUV = fTexcoords.xy;
-    if (fTexcoords.x <= 0.5) {
+
+    revUV.x = 0.5 * (1.0 + revUV.x);
+    revUV.y = 0.5 * (1.0 + revUV.y);
+
+
+
+    if (fTexcoords.x <= 0.0) {
         revUV.x = revUV.x * 2.0;
     } else {
         revUV.x = (revUV.x - 0.5) * 2.0;
@@ -44,7 +50,7 @@ void main(void)
     st *= radius;
     st += 0.5;
     
-    if (fTexcoords.x <= 0.5) {
+    if (fTexcoords.x <= 0.0) {
         st.x *= 0.5;
         st.x += 0.5;
         st.y = 1.0 - st.y;
