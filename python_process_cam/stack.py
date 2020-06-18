@@ -11,6 +11,7 @@ import cv2
 
 
 
+
 def getFileContent(file):
     content = open(file, 'r').read()
     return content
