@@ -1,0 +1,40 @@
+#streamimage {
+}
+
+table /*buttontable*/ {
+	padding-top: 10px;
+}
+
+td.button {
+	/*
+	display: block;
+	margin: 5px 5px 5px 5px;
+	*/
+	width: 60px;
+	height: 60px;
+	font-family: Arial;
+	font-size: 18pt;
+	font-weight: bold;
+	color: black;
+	background-color: grey;
+}
+
+td.button:hover {
+	background-color: green;
+}
+
+td.button:active {
+	background-color: red;
+}
+
+
+html {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
