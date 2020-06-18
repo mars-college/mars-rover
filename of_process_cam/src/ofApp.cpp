@@ -38,12 +38,14 @@ void ofApp::setup(){
     // GUI
     offset.set("uvOffset", ofVec4f(0,0.0,0,0.0), ofVec4f(-0.1), ofVec4f(0.1));
     radius.set("radius", 0.445, 0.0, 1.0);
+    showEqui.set("showEquirectangular", false);
     showSphere.set("showSphere", false);
     thetaParams.add(offset);
     thetaParams.add(radius);
     gui.setup(thetaParams);
     gui.setName("360 streamer");
     gui.add(showSphere);
+    gui.add(showEqui);
     
     
     // SETUP ASSETS
@@ -74,18 +76,21 @@ void ofApp::update(){
 void ofApp::draw(){
     ofBackground(0);
     
-    if (showSphere) {
-        ofEnableDepthTest();
-        cam.begin();
-        fbo.getTexture().bind();
-        sphere.draw();
-        fbo.getTexture().unbind();
-        cam.end();
+    if  (showEqui) {
+        if (showSphere) {
+            ofEnableDepthTest();
+            cam.begin();
+            fbo.getTexture().bind();
+            sphere.draw();
+            fbo.getTexture().unbind();
+            cam.end();
+        }
+        else {
+            fbo.draw(175, 20, 1280, 720);
+        }
+    } else {
+        theta.draw(0, 0);
     }
-    else {
-        fbo.draw(175, 20, 1280, 720);
-    }
-    
     ofDisableDepthTest();
 
     gui.draw();

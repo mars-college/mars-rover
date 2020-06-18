@@ -34,6 +34,7 @@ class ofApp : public ofBaseApp{
     ofParameter<ofVec4f> offset;
     ofParameter<float> radius;
     ofParameter<bool> showSphere;
+    ofParameter<bool> showEqui;
     ofParameterGroup thetaParams;
     ofxPanel gui;
 };
