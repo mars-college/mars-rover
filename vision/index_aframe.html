@@ -1,0 +1,45 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content="360 Video to Aframe">
+    <title>Aframe webcam</title>
+    <!-- <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script> -->
+    <script src="aframe.min.js"></script>
+</head>
+<body>
+
+
+<a-scene>
+    <a-assets>
+        <audio id="audio" autoplay="true" crossOrigin="anonymous"></audio>
+        <video id="video" autoplay="true" crossOrigin="anonymous">
+
+             <!-- <source src="ayu.mp4"></source> -->
+            
+        </video>
+    </a-assets>
+    <a-videosphere src="#video" rotation="0 180 0"></a-videosphere>
+</a-scene> 
+
+<script src="client.js"></script>
+
+<script>
+    start(true);
+</script>
+
+<script>
+    window.addEventListener('click', function () {
+      var video = document.querySelector('#video');
+      if (video.paused == true) {
+          console.log("PLAY");
+        video.play();
+        } else {
+            console.log("PAUSE");
+        video.pause();
+      }
+    }, false);
+   
+  </script>
+
+</body>
+</html>
