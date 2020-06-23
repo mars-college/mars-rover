@@ -20,6 +20,14 @@ no spider bots yet...
 
 ## Phil's Parts
 
+### NVIDIA Jetson Nano Developer Kit vB01
+
+* [NVIDIA Jetson Nano Developer Kit (945-13450-0000-100)](https://www.amazon.com/gp/product/B084DSDDLT/)
+
+### Makeronics Jetson Nano 8265AC/8265NGW Wireless NIC Module
+
+* [Makeronics Jetson Nano 8265AC/8265NGW Wireless NIC Module M.2 NGFF Support 2.4GHz / 5GHz 300Mbps / 867Mbps Dual Band WiFi and Bluetooth 4.2](https://www.amazon.com/gp/product/B07X2NLL85/)
+
 ### Tank Robot Platform
 
 Notes: Kit for assembly takes about 2 hours to complete. Seems pretty solid.
