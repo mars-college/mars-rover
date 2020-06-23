@@ -11,7 +11,7 @@ def main():
 	address = 0x40
 
 	while True:
-		bus.write_i2c_block_data(address, 0, [count])
+		bus.write_byte_data(address, 0, count)
 		count+=1
 		count%=256
 		print(count)
@@ -22,5 +22,5 @@ if __name__ == "__main__":
 		main()
 	except Exception as e:
 		print ("")
-		print ("Exception triggered.")
+		print ("Exception triggered. Exiting")
 		print(e)

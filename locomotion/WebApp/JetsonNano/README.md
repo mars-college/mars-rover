@@ -1,4 +1,4 @@
-# Javascript Remote Control of Robotic Tank Platform over WebSockets
+# Remote Control of Robotic Tank Platform over WebSockets (Raspberry Pi)
 
 This walkthrough covers steps to setting up remote control of a Mountain Ark SR-08 robotic tank platform with a Raspberry Pi over WebSockets.
 

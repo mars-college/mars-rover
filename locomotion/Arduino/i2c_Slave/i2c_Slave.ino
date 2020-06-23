@@ -1,10 +1,9 @@
 // Simple Sketch for ATTiny85
-// Listens to I2C for an 8-bit value
-// writes that value to PWM output
+// Generates PWM and Motor control signals from I2C messages
 
 #include <TinyWire.h>
 
-#define ADDRESS 0x11
+#define ADDRESS 0x11 // using 0x10 for left motor, 0x11 for right
 
 #define PWM_PIN 1 // pin #6
 #define IN1_PIN 5 // pin #1
@@ -29,16 +28,19 @@ void setup() {
 
   cli(); // clear interrupts
 
+  // Pulse Width Modulator B Enable, OCR1B cleared on compare match
+  GTCCR = 0b01100000;
+
   // timer0 PWM freqeuncy ~8Khz (16Mhz / 256 / 8)
-  TCCR0A = 0b00000011; // waveform generation mode (WGM) = fast pwm
+  TCCR0A = 0b00100011; // waveform generation mode (WGM) = fast pwm, enable OC0B clear on match
   TCCR0B = 0b00000010; // bits 0-2 are prescaler /8
 
-  // timer1 frequency ~ 60Hz ( 16Mhz / 8192 / 60 ~ 32.5 )
+  // timer1 frequency ~ 30Hz ( 16Mhz / 1024 / 256 ~ 61 Hz )
   // used for timed smoothing PWM values
-  TCCR1 = 0b10001110; //CTC - 16Mhz / 8192
-  OCR1A = 0b00000000; //interrupt when the clock is reset
-  OCR1C = 0b00010000; //clock is reset when it hits 32
-  TIMSK = 0b01000000; // attach interrupt to OCR1A
+
+  TCCR1 = 0b01001010; //PWM - 16Mhz / 2048
+  OCR1C = 0b11111111; //clock is reset when it hits TOP
+  TIMSK = 0b01000000; // attach interrupt to TOV1 when timer1 counter exceeds OCR1C
 
   sei(); // set interrupts
 
@@ -57,8 +59,6 @@ void setup() {
 //////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-  analogWrite(PWM_PIN, int(motor_speed + 0.5));
-  analogWrite(LED_PIN, int(brightness+0.5));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -66,11 +66,13 @@ void loop() {
 ISR(TIM1_COMPA_vect) {
   motor_speed += ease(motor_speed, target_speed, motor_ease);
   brightness += ease(brightness, target_brightness, led_ease);
+  OCR0B = int(motor_speed + 0.1);
+  OCR1B = int(brightness + 0.1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void onI2CReceive(int howMany) {
+void onI2CReceive() {
   byte data = 0;
   while ( TinyWire.available() > 0 ) {
     //read first byte in the buffer
@@ -81,13 +83,12 @@ void onI2CReceive(int howMany) {
         target_speed = TinyWire.read();
       } else if (data == 'd') {
         setDirection( TinyWire.read() );
-      } else if (data == 'l') {
+      } else if (data == 'b') {
         target_brightness = TinyWire.read();
       }
     }
   }
-  PORTB |= 0b10;
-  return;
+  PORTB |= 0b101;
 }
 
 //////////////////////////////////////////////////////////////////////////////
