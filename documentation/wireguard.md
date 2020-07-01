@@ -37,9 +37,35 @@ When you log back in, run `sudo wg;echo $?`. You should get an exit code `0`, wh
 
 ## Configure
 
+### Both Client + Server
+
 1. Change to your home directory: `$ cd`
 1. Make a folder named `.wg`: `$ mkdir .wg`
 1. Change directories to `.wg`: `$ cd .wg`
 1. Generate the public and private keys:
  
+### Server
+
+1. `$ sudo nano /etc/wireguard/wg0.conf`
+
+```
+```
+
+### Client 
+
+1. `$ sudo nano /etc/wireguard/wg0.conf`
+
+```
+```
+
 ## Connect
+
+### Server
+
+1. `$ sudo wg-quick wg0 up`
+1. `$ sudo wg`
+
+### Client
+
+1. `$ sudo wg-quick wg0 up`
+1. `$ sudo wg`
