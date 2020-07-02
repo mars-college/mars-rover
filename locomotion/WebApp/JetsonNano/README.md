@@ -1,6 +1,8 @@
-# Remote Control of Robotic Tank Platform over WebSockets (Raspberry Pi)
+# Remote Control of Robotic Tank Platform over WebSockets (Jetson Nano)
 
-This walkthrough covers steps to setting up remote control of a Mountain Ark SR-08 robotic tank platform with a Raspberry Pi over WebSockets.
+### WARNING: Currently incomplete! It's in the process of being modified from the Raspberry Pi guide.
+
+This walkthrough covers steps to setting up remote control of a Mountain Ark SR-08 robotic tank platform with a Jetson Nano over WebSockets.
 
 Hardware setup is not covered in detail.
 
@@ -21,14 +23,16 @@ To reproduce the project in its entirety, you'll need to have access to an elect
 * Soldering Iron and supplies
 * Wire clippers and strippers
 * Header pins or sockets
-* A breadboard
+* A couple of breadboards
 * Jumper wires compatible with the breadboard and header pins/sockets
 * Multimeter (for checking voltages and 
 * Oscilloscope for debugging hardware and connections (optional).
+* USBtinyISP or some other ISP compatible with Arduino and ATTiny85
 
-### Hardware
+### Hardware/Parts
 
-* Raspberry Pi (Zero W used) - configured and ready to go.
+* 2x ATTiny85
+* Jetson Nano Development Kit B01 - configured and ready to go.
 * [TB6612 breakout board from Adafruit](https://www.adafruit.com/product/2448) - [TB6612 Datasheet](resources/TB6612FNG_datasheet_en_20121101.pdf)
 * 2x 3.7V 18650 Li-Ion cells.
 * [4.5-28V to 0.8V-20V DC Buck converter](https://www.amazon.com/gp/product/B01MQGMOKI/)
@@ -36,16 +40,17 @@ To reproduce the project in its entirety, you'll need to have access to an elect
 
 ### Software
 
-* Raspberry Pi accessible over SSH on a local network
+* Arduino IDE
+* TinyWire library
 * Python3
-* pigpio GPIO control application for Raspberry Pi
-* tornado python web server framework
+* Jetson.GPIO - python wrapper for controlling J41 GPIO header pins
+* `tornado` python web server framework
 
-## Hardware Pre-flight
+## Pre-flight
 
-* Make sure your Raspberry Pi is configured to connect to your WiFi network and that you can SSH into it.
+* Make sure your Jetson Nano is configured to connect to your WiFi network and that you can SSH into it.
 * Assemble the TR-08 tank platform.
-* Determine which voltage rails will carry regulated +5V and which will be connected directly to the LI battery pack.
+* Determine which voltage rails on your breadboard will carry regulated +5V and which will be connected directly to the LI battery pack.
 * Assemble and connect [TB6612 breakout board](https://www.adafruit.com/product/2448).
 * Solder any necessary connections to allow easy and secure insertion into/onto breadboard or header sockets/pins.
 * The Raspberry Pi used is powered from a Micro USB connection. I've cut and prepared a Micro USB power cable to be inserted into a breadboard.
