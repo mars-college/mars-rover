@@ -90,3 +90,7 @@ Resources:
 ### 4G Module
 
 * [waveshare SIM7600G-H 4G/3G/2G/GNSS Expansion Board for Jetson Nano Supports LTE CAT4 up to 150Mbps Global Applicable for GPS, BeiDou, Glonass, LBS Base Station Positioning](https://www.amazon.com/gp/product/B085MJD742/)
+
+### 4GLTE SIM
+
+* [Mint](https://www.mintmobile.com) - $45 introductory offer for 3mos of 3GB/mo 4GLTE data
