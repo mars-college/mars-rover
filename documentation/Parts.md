@@ -47,6 +47,11 @@ Notes: Kit for assembly takes about 2 hours to complete. Seems pretty solid.
 
 * [18650 Battery Charger, FARSAIL Rechargeable Battery Charger Compatible with 3.7V Lithium ion 18650 18350 18500 RCR123A 18490 17670 17500 and NiMH/NiCd AA AAA Rechargeable Batteries](https://www.amazon.com/gp/product/B077VVNYLY/)
 * [USB C 21700 Battery Charger XTAR VC8 Type C 3A Fast 18650 Charger 8-Bay Smart Charger with Automatic LCD Display for 3.6V 3.7V Li-ion 10440 16340 18700 26650 1.2V Ni-MH AA AAA C](https://www.amazon.com/gp/product/B07ZSHFFHF/)
+* [LiPo Battery Charger 1S-6S Balance Discharger Digital Battery Pack Charger for NiMH/NiCD/Li-Fe Packs w/LCD Display Hobby Battery Chargers w/Tamiya/JST/EC3/HiTec/Deans Connectors + Power Supply ](https://www.amazon.com/gp/product/B07P71CKFW/)
+
+### Battery Management System / Protection
+
+* [Anmbest Enhanced 3S 11.1V/12V/12.6V 40A 18650 Charger PCB BMS Protection Board Li-ion Lithium Battery Charger Lipo Cell Module for Drill Motor 12.6V](https://www.amazon.com/gp/product/B07RPW8MM6/)
 
 ### Motor driver boards
 
