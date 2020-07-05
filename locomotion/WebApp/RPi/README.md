@@ -34,7 +34,7 @@ To reproduce the project in its entirety, you'll need to have access to an elect
 	* [Configure to connect to a WiFi network](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
 	* Know the IP address of you Raspberry pi on your WiFi network.
 	* Be able to login and manage over `ssh`
-* [TB67H420FTG Dual/Single Motor Driver](https://www.pololu.com/product/2999) - [TB67H420FTG Datasheet](resources/TB67H420FTGFNG_datasheet_en_20121101.pdf)
+* [TB67H420FTG Dual/Single Motor Driver](https://www.pololu.com/product/2999)
 * [4x 3.7V 18650 Li-Ion cells](https://www.batteryjunction.com/lg-mh1-18650-3200mah-battery.html).
 * [4x 18650 battery holder](https://www.amazon.com/gp/product/B06XSHT9HC/).
 * [4x 18650 battery charger](https://www.amazon.com/Universal-Battery-Charger-Rechargeable-Batteries/dp/B07BFWHD7G/)
@@ -54,9 +54,6 @@ To reproduce the project in its entirety, you'll need to have access to an elect
 
 * Make sure your Raspberry Pi is configured to connect to your WiFi network and that you can SSH into it.
 * Assemble the TR-08 tank platform.
-* Determine which voltage rails will carry regulated +5V and which will be connected directly to the LI battery pack.
-* Assemble and connect [TB67H420FTG breakout board]().
-* Solder any necessary connections to allow easy and secure insertion into/onto breadboard or header sockets/pins.
 * The Raspberry Pi used is powered from a Micro USB connection. I've cut and prepared a Micro USB power cable to be inserted into a breadboard.
 
 ### Assemble TR-08 Tank Platform
@@ -65,7 +62,7 @@ Follow the instructions provided in their [video](https://www.youtube.com/watch?
 
 ### Setting up Power Connections
 
-* Charge your LI batteries fully before proceeding.
+* Charge your LI batteries fully.
 
 * 4x LI battery cells in series will have an operating range of 12V - 16.8V. This needs to be regulated down to 5V for the Raspberry Pi. A Buck Converter board is used to achieve this. 
 
