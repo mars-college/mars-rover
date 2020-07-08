@@ -6,19 +6,12 @@
 #define ADDRESS 0x11 // using 0x10 for left motor, 0x11 for right
 
 #define PWM_PIN 1 // pin #6
-#define IN1_PIN 5 // pin #1
-#define IN2_PIN 3 // pin #2
-#define LED_PIN 4 // pin #3
+#define IN1_PIN 3 // pin #2
+#define IN2_PIN 4 // pin #3
 
-float motor_ease = 0.125;
+float motor_ease = 0.25;
 float motor_speed = 0; // actual motor speed (0-255)
 int target_speed = 0; // target motor speed (0-255)
-
-float led_ease = 0.0125;
-float brightness = 0; // LED brightness (0-255)
-int target_brightness = 0; // target brightness (0-255)
-
-boolean state = false;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +22,8 @@ void setup() {
   cli(); // clear interrupts
 
   // Pulse Width Modulator B Enable, OCR1B cleared on compare match
-  GTCCR = 0b01100000;
+//  GTCCR = 0b01100000; // PB4 enabled
+  GTCCR = 0b01000000; // PB4 disabled
 
   // timer0 PWM freqeuncy ~8Khz (16Mhz / 256 / 8)
   TCCR0A = 0b00100011; // waveform generation mode (WGM) = fast pwm, enable OC0B clear on match
@@ -47,7 +41,6 @@ void setup() {
   pinMode(PWM_PIN, OUTPUT);
   pinMode(IN1_PIN, OUTPUT);
   pinMode(IN2_PIN, OUTPUT);
-  pinMode(LED_PIN, OUTPUT);
 
   // config TinyWire library for I2C slave functionality
   TinyWire.begin( ADDRESS );
@@ -65,9 +58,7 @@ void loop() {
 
 ISR(TIM1_COMPA_vect) {
   motor_speed += ease(motor_speed, target_speed, motor_ease);
-  brightness += ease(brightness, target_brightness, led_ease);
-  OCR0B = int(motor_speed + 0.1);
-  OCR1B = int(brightness + 0.1);
+  OCR0B = int(motor_speed);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -83,8 +74,6 @@ void onI2CReceive() {
         target_speed = TinyWire.read();
       } else if (data == 'd') {
         setDirection( TinyWire.read() );
-      } else if (data == 'b') {
-        target_brightness = TinyWire.read();
       }
     }
   }
@@ -101,8 +90,8 @@ float ease(float _val, int _target, float _ease) {
 
 void setDirection(boolean dir) {
   if (dir) {
-    PORTB = 1 << IN1_PIN | 0 << IN2_PIN;
+    PORTB = ( PORTB & 0b100111 ) | ( ( (0 << IN1_PIN) & 0b001000 ) | ( (1 << IN2_PIN ) & 0b010000 ) );
   } else {
-    PORTB = 0 << IN1_PIN | 1 << IN2_PIN;
+    PORTB = ( PORTB & 0b100111 ) | ( ( (1 << IN1_PIN) & 0b001000 ) | ( (0 << IN2_PIN ) & 0b010000 ) );
   }
 }
