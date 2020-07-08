@@ -3,7 +3,7 @@
 
 #include <TinyWire.h>
 
-#define ADDRESS 0x11 // using 0x10 for left motor, 0x11 for right
+#define ADDRESS 0x10 // using 0x10 for left motor, 0x11 for right
 
 #define PWM_PIN 1 // pin #6
 #define IN1_PIN 3 // pin #2
@@ -90,8 +90,8 @@ float ease(float _val, int _target, float _ease) {
 
 void setDirection(boolean dir) {
   if (dir) {
-    PORTB = ( PORTB & 0b100111 ) | ( ( (0 << IN1_PIN) & 0b001000 ) | ( (1 << IN2_PIN ) & 0b010000 ) );
-  } else {
     PORTB = ( PORTB & 0b100111 ) | ( ( (1 << IN1_PIN) & 0b001000 ) | ( (0 << IN2_PIN ) & 0b010000 ) );
+  } else {
+    PORTB = ( PORTB & 0b100111 ) | ( ( (0 << IN1_PIN) & 0b001000 ) | ( (1 << IN2_PIN ) & 0b010000 ) );
   }
 }
