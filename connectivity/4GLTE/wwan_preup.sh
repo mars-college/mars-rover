@@ -47,7 +47,9 @@ if (lsmod | grep "$MODULE" >/dev/null 2>&1); then
 		ifconfig "$IFACE" up
 		if (ls /dev | grep "$DEV" >/dev/null 2>&1); then
 			if (echo 'AT+CNMP=2' > "/dev/$DEV"); then
+				sleep 5
 				if (echo 'AT$QCRMCALL=1,1' > "/dev/$DEV"); then
+					sleep 10
 					echo "[+] $IFACE at /dev/$DEV is ready for IP Address"
 					exit 0
 				else
