@@ -4,7 +4,10 @@ Last thing we want is to use unencrypted communication. Anyone can sniff the net
 
 This guide walks through the basics of creating a self-signed certificate.
 
-### Use-case scenario
+### Use-case scenarios
+
+* running an https server on the Jetson Nano
+* securing WebRTC streams
 
 This method is for development environments only. Production environments require a certificate signed by a Certified Authority (CA). Using a self-signed certificate will result in browser warnings. Scary stuff for the average user.
 
