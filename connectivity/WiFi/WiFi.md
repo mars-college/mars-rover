@@ -48,13 +48,13 @@ Some possible issues:
 
 ## Setting up access to existing WiFi network
 
-Using `nmcli`, the Network Manager Command Line Interface utility (replace text inside `<>` symbols):
+Using `nmcli`, the Network Manager Command Line Interface utility (replace `<text>` to suit your needs):
 
 1. `$ sudo su`
 1.  `# nmcli c a con-name "<CONNECTION_NAME>" ifname wlan0 type wifi ssid "<YOUR_WIFI_NETWORK_SSID>"`
 	1. (optional) add to the command: `ip4 10.79.20.205/24 gw4 10.79.20.1` to assign an IP address and gateway address
-1. `# nmcli c m MARS wifi-sec.key-mgmt wpa-psk`
-1. `# nmcli c m MARS wifi-sec.psk "<YOUR_WIFI_NETWORK_PASSWORD>"`
+1. `# nmcli c m "<CONNECTION_NAME>" wifi-sec.key-mgmt wpa-psk`
+1. `# nmcli c m "<CONNECTION_NAME>" wifi-sec.psk "<YOUR_WIFI_NETWORK_PASSWORD>"`
 1. Connect using: `$ nmcli c up "<CONNECTION_NAME>"`
 
 ## Setting up as WiFi access point
