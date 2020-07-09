@@ -1,16 +1,16 @@
 # Remote Control of Robotic Tank Platform over WebSockets (Jetson Nano)
 
-### WARNING: Currently incomplete! It's in the process of being modified from the Raspberry Pi guide.
+### WARNING: Currently Untested! It's *mostly* complete, but not yet verified. Proceed at your own risk!
 
-This walkthrough covers steps to setting up remote control of a Mountain Ark SR-08 robotic tank platform with a Jetson Nano over WebSockets.
+This walkthrough covers steps to setting up remote control of a Mountain Ark SR-08 robotic tank platform with a Jetson Nano over WebSockets on a local WiFi network.
 
-Hardware setup is not covered in detail.
+Some hardware setup is not covered in detail.
 
 ## Assumptions
 
 * Your host system is running OSX, though this should work on  Windows and Linux as well.
-* A basic working knowledge of Linux CLI, Raspberry Pi, Python.
-* You've clones this repository locally.
+* A basic working knowledge of Linux CLI, Arduino, Jetson Nano, Python.
+* You've cloned this repository locally.
 * Nice to have but not necessary to know JavaScript, WebSockets, Python, HTML.
 * Experience prototyping electronics enough to know how to setup a breadboard to handle two different voltages.
 
@@ -23,102 +23,172 @@ To reproduce the project in its entirety, you'll need to have access to an elect
 * Soldering Iron and supplies
 * Wire clippers and strippers
 * Header pins or sockets
-* A couple of breadboards
+* A breadboard
 * Jumper wires compatible with the breadboard and header pins/sockets
 * Multimeter (for checking voltages and 
 * Oscilloscope for debugging hardware and connections (optional).
-* USBtinyISP or some other ISP compatible with Arduino and ATTiny85
+* Shrink Tube + Lighter (optional)
+* [USBtinyISP](http://www.gikfun.com/various-electronic-modules-c-68/usbtinyisp-usbtiny-isp-programmer-bootloader-avr-w-usb-6-pin-p-133.html) or some other ISP compatible with Arduino and ATTiny85
 
 ### Hardware/Parts
 
-* 2x ATTiny85
-* Jetson Nano Development Kit B01 - configured and ready to go.
-* [TB6612 breakout board from Adafruit](https://www.adafruit.com/product/2448) - [TB6612 Datasheet](resources/TB6612FNG_datasheet_en_20121101.pdf)
+* 2x [ATTiny85](https://www.mouser.com/productdetail/microchip-technology-atmel/attiny85-20pu?qs=8jWQYweyg6NCiiaOb5GI9Q%3D%3D)
+* Jetson Nano Development Kit B01 - [setup](https://www.jetsonhacks.com/2019/08/21/jetson-nano-headless-setup/) and ready to go.
+	* able to login over `ssh`?
+	* [8265AC/8265NGW Wireless NIC Module](https://www.amazon.com/gp/product/B07X2NLL85) [installed](https://www.jetsonhacks.com/2019/04/08/jetson-nano-intel-wifi-and-bluetooth/) and able to connect to your local network?
+* [TB67H420FTG Dual/Single Motor Driver](https://www.pololu.com/product/2999)
 * 2x 3.7V 18650 Li-Ion cells.
-* [4.5-28V to 0.8V-20V DC Buck converter](https://www.amazon.com/gp/product/B01MQGMOKI/)
+* [5A DC-DC Adjustable Buck Converter 4~38v to 1.25-36v Step Down Power Supply](https://www.amazon.com/gp/product/B079N9BFZC/)
+* [8x 3.7V 18650 Li-Ion cells](https://www.batteryjunction.com/lg-mh1-18650-3200mah-battery.html).
+* [2x 18650 battery holders](https://www.amazon.com/gp/product/B06XSHT9HC/).
+* 2x 5.5mm x 2.1mm plug with wires
+* 1x 5.5mm x 2.1mm socket with wires
+* [8-Bay Charger for Li-ion 18650 batteries](https://www.amazon.com/gp/product/B07ZSHFFHF/)
 * [SR-08 tank platform](https://www.amazon.com/gp/product/B07JPL6MHR/) with included motors.
+* 5V to 3.3V regulator
 
 ### Software
 
 * Arduino IDE
-* TinyWire library
+	* ATTiny Boards Manager
+	* TinyWire library
 * Python3
 * Jetson.GPIO - python wrapper for controlling J41 GPIO header pins
 * `tornado` python web server framework
 
-## Pre-flight
-
-* Make sure your Jetson Nano is configured to connect to your WiFi network and that you can SSH into it.
-* Assemble the TR-08 tank platform.
-* Determine which voltage rails on your breadboard will carry regulated +5V and which will be connected directly to the LI battery pack.
-* Assemble and connect [TB6612 breakout board](https://www.adafruit.com/product/2448).
-* Solder any necessary connections to allow easy and secure insertion into/onto breadboard or header sockets/pins.
-* The Raspberry Pi used is powered from a Micro USB connection. I've cut and prepared a Micro USB power cable to be inserted into a breadboard.
+## Let's Built It!
 
 ### Assemble TR-08 Tank Platform
 
 Follow the instructions provided in their [video](https://www.youtube.com/watch?v=wATykzn6Z34).
 
+### Burning the ATTiny85s
+
+1. Download and the Arduino IDE
+1. Add this link to the "Additional Boards Manager URLs" in the Arduino Preferences: `https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json`
+1. Clone the TinyWire library into your `Arduino/libraries` folder: `git clone https://github.com/lucullusTheOnly/TinyWire.git` 
+1. Maybe restart Arduino IDE?
+1. In the "Tools" pulldown of the Arduino IDE, make the following selections:
+
+```
+Board: "ATTiny25/45/85"
+Processor: "ATTiny85"
+Clock: "Internal 16 MHz"
+Programmer: "USBtinyISP
+```
+
+1. Connect the USBtinyISP to your host machine
+1. Use wire jumpers (with header style pins) to connect the USBtinyISP 6-pin output to a breadboard in such a way that you can easily insert, program, and remove the ATTiny85s
+1. Insert the first ATTiny85
+1. Select "Burn Bootloader" from the "Tools" menu
+1. Open `i2c_Slave.ino` in `/path_to_the_repo/mars-rover-main/locomotion/Arduino/`
+1. Change the `ADDRESS` to `0x10` for the left motor
+1. Press the "Upload" button.
+1. Remove and label the ATTiny85: "L"
+1. Insert the second ATTiny85
+1. Change the `ADDRESS` to `0x11` for the right motor
+1. Press the "Upload" button.
+1. Remove and label the ATTiny85: "R"
+
+***WARNING***: You cannot use `i2cdetect` to confirm the ATTiny85s are connected to the Jetson Nano. Due to some issue I've still not wrapped my head around, doing so will cause the SDA lines to drive low and not return high until the MCUs are reset (power cycled). Use an oscilloscope to verify connectivity via the PWM outputs.
+
 ### Setting up Power Connections
 
-* Charge your LI batteries fully before proceeding.
+#### 1. Prepare the Breadboard
 
-LI battery cells have an operating range from ~8V - ~6.5V. This needs to be regulated down to 5V for the Raspberry Pi and the TB6612 board. A Buck Converter board is used to achieve this. 
+* Use pre-cut, solid-core jumpers.
+* Connect the `GND` rails of the breadboard with a jumper.
+* Label your breadboard with one `+V` rail carrying `+5V` and the other `+3.3V`.
 
-* Do not place batteries into the compartment until you are ready to adjusts the voltage output on the buck converter!
+#### 2. Making the battery pack
 
-The idea is that you will set your breadboard up with on rail as carrying the direct connection to the LI battery pack and the other will carry the regulated 5V.
+* Charge your Li-ion batteries fully.
 
-The Raspberry Pi is powered over a Micro USB connection. For this project, I cut an existing cable and fitted the wires with header pins for easy insertion into a breadboard.
+* The Li-ion battery pack is setup in a 4s2p configuration for a total of 12V @ ~7000mAh. It has an operating range from 12V - 16.8V. This needs to be regulated down to 5V for the Jetson Nano. A Buck Converter board is used to achieve this. 
 
-1. Solder header pins to your [4.5-28V to 0.8V-20V DC Buck converter](https://www.amazon.com/gp/product/B01MQGMOKI/) and insert into breadboard.
-1. Connect the `V+ in` and `GND in` of the Buck Converter to the voltage rails on the side of the breadboard which will connect to the LI batteries.
-1. Connect the `V+ out` and `GND out` of the Buck Converter to the voltage rails on side of the breadboard which will carry the regulated 5V.
-1. Connect the LI battery to the appropriate voltage rail on your breadboard.
-1. Insert fully charged LI cells into the battery compartment.
-1. Using a multimeter and a small screw driver, adjust the output of the buck converter until it reads between +5.0 to 5.1 volts.
-1. Disconnect the LI batteries.
-1. Insert a prepare Micro USB cable into the breadboard (you'll have to cut and solder appropriate connections (like header pins)
+* With the battery holders empty...
 
-### Assemble and Connect TB6612 Breakout
+1. Strip the ends of the compartment wires
+1. Strip the ends of the 5.5mm x 2.1mm plug with wires
+1. Cut and slide shrink wrap over the wires
+1. Twist and solder the +V wires together.
+1. Twist and solder the GND wires together.
+1. Use a multimeter to confirm connectivity from the battery holders to the 5.5mm x 2.1mm plug
+1. Trim excess conductors, slide shrink tube over the joints, shrink to prevent shorting.
 
-1. Solder header pins and insert into a breadboard.
-1. Use jumpers to connect `GND` pins to the breadboard rail you've setup as common ground.
-1. Connect the `VCC` pin of the breakout board to the breadboard rail you've setup as the `+5V` connection to your LI battery pack. 
-1. Connect the `VM` pin of the breakout board to the breadboard rail you've setup as the `+` connection to your LI battery pack.
-1. Connect the remaining pins using [this diagram](https://pinout.xyz/) as follows:
+* Once charged, place the batteries into the compartment and test voltage with a multimeter. You should get ~16.5V
 
-```
-TB6612		RPi GPIO	OTHER
-------		--------	-----
-GND 		GPIO 34
-PWMA		BCM 12
-PWMB		BCM 13
-AIN1		BCM 4
-AIN2		BCM 17
-BIN1		BCM 27
-BIN2		BCM 22
-MOTORA(1)	--			MOTORA+
-MOTORA(2)	--			MOTORA-
-MOTORB(1)	--			MOTORB+
-MOTORB(2)	--			MOTORB-
-STANDBY		TBD
-```
+#### 3. Setting up the Step Down Converter
 
-### Install Software on Raspberry Pi
+* The step-down voltage converter will be used only to supply the Jetson Nano with 5V with a max of 5A.
 
-Complete the following steps while connected to the Raspberry Pi over WiFi via ssh. It's recommended that you do this is the Raspberry Pi plugged into a AC adapter instead of the LI battery pack.
+* The Jetson Nano is powered over a 5.5mm x 2.1mm barrel connection. For this project, I cut an existing cable and fitted the wires with header pins for easy insertion into a breadboard.
+
+1. Solder the `+V` and `GND` **output** of the step down converter to a 5.5mm x 2.1mm **plug**. 
+1. **DO NOT PLUG INTO THE JETSON NANO YET**
+1. Solder the `+V` and `GND` **input** of the step down converter to wires that can be inserted into the breadboard.
+1. **DO NOT CONNECT THE STEP DOWN CONVERTER TO THE BREADBOARD YET**
+
+* The LI battery pack connects directly to the Motor Driver. We'll set that up next.
+
+#### 4. Setting up the Motor Driver
+
+* The Motor Driver has terminal blocks for +VM and each motor.
+
+1. Solder provided terminal blocks (on the top) and header pins (pointed down) to the [TB67H420FTG Dual/Single Motor Driver](https://www.pololu.com/product/2999) and insert into the breadboard.
+1. Use jumpers to connect the Motor Driver `VCC` (+V) pin to the `+5V` rail on the breadboard.
+1. Use jumpers to connect the `GND` pins to the `GND` rail on the breadboard.
+1. Connect the "LEFT" motor to the `MOTORA` terminal block (match + with red, - with black)
+1. Connect the "RIGHT" motor to the `MOTORB` terminal block (match + with red, - with black)
+1. Connect a 5.5mm x 2.1mm jack to the `VM` terminal block on the Motor Driver.
+1. Double check your connections.
+
+#### 5. Powering the breadboard rails
+
+1. Plug the battery pack into the +VM jack.
+1. Use a multimeter to measure +5V on the `VCC` output of the Motor Driver.
+1. Place the 3.3V regulator on the breadboard and connect its `VIN` to `+5V`, it's `GND` to `GND` and measure +3.3V on its output. Use jumpers.
+
+#### 6. Adjusting Step Down Converter
+
+1. Connect the `+V IN` wire of the Step Down Converter to the `VM` of the Motor Driver on the breadboard
+1. Connect the `GND IN` wire of the Step Down Converter to the `GND` rail of the breadboard.
+1. Use a multimeter to measure the voltage at the output of the Step Down Converter.
+1. Use a precision flat head screw driver to adjust the voltage until it's ~5.125V
+
+#### 7. Connect the ATtiny85s
+
+1. Insert the ATTiny85s into the breadboard and use jumpers to connect them to the `+3.3V` and `GND` rails.
+1. Use jumpers to connect their `SDA` and `SCL` pins together for form SDA and SCL I2C "busses"
+1. Connect the SDA bus to pin 3 of the Jetson Nano J-41 40-pin header.
+1. Connect the SCL bus to pin 5 of the Jetson Nano J-41 40-pin header.
+1. Connect `pin 6` of the "LEFT" ATTiny85 to the `PWMA` pin on the Motor Driver.
+1. Connect `pin 1` of the "LEFT" ATTiny85 to the `AIN1` pin on the Motor Driver.
+1. Connect `pin 2` of the "LEFT" ATTiny85 to the `AIN2` pin on the Motor Driver.
+1. Connect `pin 6` of the "RIGHT" ATTiny85 to the `PWMB` pin on the Motor Driver.
+1. Connect `pin 1` of the "RIGHT" ATTiny85 to the `AIN1` pin on the Motor Driver.
+1. Connect `pin 2` of the "RIGHT" ATTiny85 to the `AIN2` pin on the Motor Driver.
+
+### Secure Parts to the Platform
+
+* No specific placement suggestions just yet
+* Zip-ties help
+* Pay attention to where your connections need to be made
+* Move things around before you lock them down
+
+### Install Software on Jetson Nano
+
+Complete the following steps while connected to the Jetson Nano over WiFi via ssh. It's recommended that you do this with the Nano plugged into a AC adapter instead of the Li-ion battery pack.
 
 1. `$ sudo apt-get update; sudo apt-get upgrade -y`
-1. `$ sudo apt-get install pigpio pigpiod python3-pigpio`
 1. `$ sudo apt-get install python3-tornado` 
 1. `$ sudo shutdown -h now`
 
-Disconnect from the AC adapter and connect to the power connector on the platform (Micro USB you inserted into the breadboard)
+Disconnect from the AC adapter and connect to the power connector on the platform.
 
 ## Testing WebSockets Locally
 
-To test locally on your host, you'll need to make sure that you have tornado installed.
+To test locally on your host, you'll need to make sure that you have `tornado` installed.
 
 1. `$ pip3 install tornado`
 1. `$ cd <repository_root_path>/WebApp`
@@ -129,22 +199,7 @@ To test locally on your host, you'll need to make sure that you have tornado ins
 
 ## Controlling the Robot!
 
-You'll need to power the Raspberry Pi from the LI battery pack now and locate the robot to a place where it can move freely but still maintain WiFi connectivity.
-
-### Start `pigpiod` on the RPi
-
-The `pigpio` library runs a separate service that manages communication with the GPIO pins. You need to start the `pigpiod` service first.
-
-1. `$ sudo pigpiod`
-
-Optionally, you can have this start up automatically on boot up.
-
-1. `$ cd <repository_root_path>/locomotion/WebApp`
-1. `$ sudo cp pigpiod.service /etc/systemd/system/`
-1. `$ sudo systemctl daemon-reload`
-1. `$ sudo systemctl enable pigpiod`
-1. `$ sudo systemctl start pigpiod`
-
+You'll need to power the Raspberry Pi from the Li-ion battery pack now and locate the robot to a place where it can move freely but still maintain WiFi connectivity.
 
 ### Fire up the HTTP server on the RPi
 
@@ -158,12 +213,12 @@ Optionally install and manage as a `systemd` service, `rover.service` using `ins
 * start the server: `sudo systemctl start rover.service`
 * stop the server: `sudo systemctl stop rover.service`
 * restart the server: `$ sudo systemctl restart rover.service`
-* enable startup on boot: `sudo systemctl enable reover.service`
-* disable startup on boot: `sudo systemctl disable reover.service`
+* enable startup on boot: `sudo systemctl enable rover.service`
+* disable startup on boot: `sudo systemctl disable rover.service`
 
 ### Access the control interface on your host machine
 
-1. Make sure you know the IP address of your Raspberry Pi: `$ ifconfig wlan0`
+1. Make sure you know the IP address of your Nano: `$ ifconfig wlan0`
 1. Open a browser on your host (make sure you have JavaScript enabled!) and navigate to: `http://<your_pi_IP_Address>:80`
 1. Check the WebSocket status in the bottom and make sure it reads `connected`. If not, open the WebConsole (Firefox) and look for errors.
 
