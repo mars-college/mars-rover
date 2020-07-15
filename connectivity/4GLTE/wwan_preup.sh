@@ -44,24 +44,49 @@ fi
 
 if (lsmod | grep "$MODULE" >/dev/null 2>&1); then
 	if (ifconfig -a | grep "$IFACE" >/dev/null 2>&1); then
+<<<<<<< Updated upstream
 		ifconfig "$IFACE" up
 		if (ls /dev | grep "$DEV" >/dev/null 2>&1); then
 			if (echo 'AT+CNMP=2' > "/dev/$DEV"); then
 				if (echo 'AT$QCRMCALL=1,1' > "/dev/$DEV"); then
 					echo "[+] $IFACE at /dev/$DEV is ready for IP Address"
 					exit 0
+=======
+
+		echo 200 > /sys/class/gpio/export
+		echo "out" > /sys/class/gpio/gpio200/direction
+		echo 0 > /sys/class/gpio/gpio200/value
+		sleep 1
+		echo 1 > /sys/class/gpio/gpio200/value
+		sleep 5
+		echo 0 > /sys/class/gpio/gpio200/value
+		sleep 20
+
+		if (ifconfig "$IFACE" up >/dev/null 2>&1); then
+			if (ls /dev | grep "$DEV" >/dev/null 2>&1); then
+				if (echo 'AT+CNMP=38' > /dev/$DEV); then
+					sleep 25
+					if (echo 'AT$QCRMCALL=1,1' > /dev/$DEV); then
+						sleep 5
+						echo "[+] $IFACE at /dev/$DEV is ready for an IP Address"
+						exit 0
+					else
+						echo "[!] Failed to activate 4G connection on $DEV"
+						exit 1
+					fi
+>>>>>>> Stashed changes
 				else
-					echo "[!] Failed to activate 4G connection on $DEV"
+					echo "[!] unable to communicate with $DEV"
+					ifconfig "$IFACE" down
 					exit 1
 				fi
 			else
-				echo "[!] unable to communicate with $DEV"
+				echo "[!] /dev/$DEV not found"
 				ifconfig "$IFACE" down
 				exit 1
 			fi
 		else
-			echo "[!] /dev/$DEV not found"
-			ifconfig "$IFACE" down
+			echo "[!] Could not bring up $IFACE."
 			exit 1
 		fi
 	else

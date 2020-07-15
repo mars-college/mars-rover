@@ -1,12 +1,12 @@
 [Unit]
-Description=Enable 4G LTE network interface %i
+Description=4G LTE network interface %i
 After=network.target 
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=/bin/bash /etc/simcom_wwan/wwan_preup.sh -i %i
-ExecStart=/sbin/udhcpc -i %i -t 5
+ExecStart=/sbin/dhclient -1 %i
 ExecStopPost=/sbin/ifconfig %i down
 
 [Install]

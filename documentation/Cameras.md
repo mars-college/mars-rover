@@ -9,4 +9,4 @@
 Resources:
 
 * [Jetson Nano + Raspberry Pi Camera](https://www.jetsonhacks.com/2019/04/02/jetson-nano-raspberry-pi-camera/)
-* [Jetson Nano B01 - Dual RPi Cameras + how to get faster frame rates](https://www.youtube.com/watch?v=GQ3drRllX3I)
+* [Jetson Nano B01 - Dual RPi Cameras + how to get faster frame rates](https://www.youtube.com/watch?v=GQ3drRllX3I)	
