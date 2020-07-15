@@ -23,12 +23,10 @@ fi
 
 echo "[+] Copying wann_preup.sh to $SCRIPT_PATH"
 cp "./$SCRIPT_FILE" "$SCRIPT_PATH"
-echo "[+] Copying sincom_wwan@.service to $SERVICE_PATH"
+echo "[+] Copying $SERVICE_FILE to $SERVICE_PATH"
 cp "./$SERVICE_FILE" "$SERVICE_PATH"
 
 echo "[+] Reloading systemd manager configuration"
 systemctl daemon-reload
-echo "[+] Enabling $SERVICE"
-systemctl enable "$SERVICE"
-systemctl start "$SERVICE"
-systemctl status "$SERVICE"
+echo "[+] Successfully installed $SERVICE_FILE!"
+echo "[+] To start, run: $ sudo systemctl start $SERVICE_FILE"

@@ -14,9 +14,10 @@ if [ "$EUID" -ne 0 ]
   exit 1
 fi
 
-systemctl disable "$SERVICE"
+echo "[+] Stopping $SERVICE_FILE"
 systemctl stop "$SERVICE"
-systemctl status "$SERVICE"
+echo "[+] Disabling $SERVICE_FILE"
+systemctl disable "$SERVICE"
 
 if [[ -d "$SCRIPT_PATH" ]]; then
 	echo "[+] Removing $SCRIPT_PATH"
