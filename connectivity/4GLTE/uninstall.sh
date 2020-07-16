@@ -2,7 +2,6 @@
 
 # Uninstall files and scripts for simcom_wwan@.service
 
-SCRIPT_FILE="wwan_preup.sh"
 SCRIPT_PATH="/etc/simcom_wwan"
 SERVICE_PATH="/lib/systemd/system"
 SERVICE_FILE="simcom_wwan@.service"

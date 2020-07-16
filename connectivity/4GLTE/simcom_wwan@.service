@@ -7,7 +7,7 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=/bin/bash /etc/simcom_wwan/wwan_preup.sh -i %i
 ExecStart=/sbin/dhclient -1 %i
-ExecStopPost=/sbin/ifconfig %i down
+ExecStopPost=/bin/bash /etc/simcom_wwan/wwan_postdown.sh -i %i
 
 [Install]
 WantedBy=multi-user.target
