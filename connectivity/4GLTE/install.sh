@@ -23,15 +23,37 @@ else
 fi
 
 echo "[+] Copying $PRE_SCRIPT_FILE to $SCRIPT_PATH"
-cp "./$PRE_SCRIPT_FILE" "$SCRIPT_PATH"
+if (cp "./$PRE_SCRIPT_FILE" "$SCRIPT_PATH"); then
+	echo "[+] Successfully copied $PRE_SCRIPT_FILE to $SCRIPT_PATH"
+else
+	echo "[!] Failed to copy $PRE_SCRIPT_FILE to $SCRIPT_PATH"
+	exit 1
+fi
 
 echo "[+] Copying $POST_SCRIPT_FILE to $SCRIPT_PATH"
-cp "./$POST_SCRIPT_FILE" "$SCRIPT_PATH"
+if (cp "./$POST_SCRIPT_FILE" "$SCRIPT_PATH"); then
+	echo "[+] Successfully copied $POST_SCRIPT_FILE to $SCRIPT_PATH"
+else
+	echo "[!] Failed to copy $POST_SCRIPT_FILE to $SCRIPT_PATH"
+	exit 1
+fi
 
 echo "[+] Copying $SERVICE_FILE to $SERVICE_PATH"
-cp "./$SERVICE_FILE" "$SERVICE_PATH"
+if (cp "./$SERVICE_FILE" "$SERVICE_PATH"); then
+	echo "[+] Successfully copied $SERVICE_FILE to $SERVICE_PATH"
+else
+	echo "[!] Failed to copy $SERVICE_FILE to $SERVICE_PATH"
+	exit 1
+fi
 
 echo "[+] Reloading systemd manager configuration"
-systemctl daemon-reload
-echo "[+] Successfully installed $SERVICE_FILE!"
-echo "[+] To start, run: $ sudo systemctl start simcom_wwan@$IFACE.service"
+
+if (systemctl daemon-reload); then
+	echo "[+] Successfully installed $SERVICE_FILE!"
+	echo "[+] To start, run: $ sudo systemctl start simcom_wwan@$IFACE.service"
+else
+	echo "[!] Reloading systemd manager configuration failed"
+	exit 1
+fi
+
+exit 0

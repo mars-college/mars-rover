@@ -52,7 +52,6 @@ if (lsmod | grep "$MODULE" >/dev/null 2>&1); then
 			if (ls /dev | grep "$DEV" >/dev/null 2>&1); then
 				# Send AT command to disconnect NIC
 				if (echo -e 'AT$QCRMCALL=0,1\r' > /dev/$DEV); then
-					sleep 5
 					echo "[+] $IFACE at /dev/$DEV is disconnected"
 					exit 0
 				else

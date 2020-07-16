@@ -50,7 +50,7 @@ if (lsmod | grep "$MODULE" >/dev/null 2>&1); then
 		if (ifconfig "$IFACE" up >/dev/null 2>&1); then
 			# Check for simcom tty device
 			if (ls /dev | grep "$DEV" >/dev/null 2>&1); then
-				# Set SIM7600 network mode preference to auto
+				# Set SIM7600 network mode preference to LTE only
 				if (echo -e 'AT+CNMP=2\r' > /dev/$DEV); then
 					sleep 10
 					# Connect NIC to network
