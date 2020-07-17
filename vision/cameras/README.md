@@ -1,5 +1,32 @@
 # Testing Cameras on the Jetson Nano
 
+### Goals
+
+Create a pipeline that streams a 360 camera feed to the web.
+
+* open the available camera feeds from CSI and USB
+* crop feeds to 1:1
+* combine feed into dual fisheye
+* convert dual fisheye to equirectangular
+* create network accessible stream (TCP/UDP/RTSP/RTP/etc.)
+* open the stream in a browser
+* display the stream in VR mode 
+
+
+## Research
+
+* [Composite Two CSI Camera stream into single RTP stream](https://forums.developer.nvidia.com/t/composite-two-csi-camera-stream-into-single-rtp-stream/127402)
+* [Linux Webcam Server](https://www.moreno.marzolla.name/software/linux-webcam-server/) - ancient but maybe useful?
+*[How to Make Raspberry Pi Webcam Server and Stream Live Video || Motion + Webcam + Raspberry Pi](https://www.instructables.com/id/How-to-Make-Raspberry-Pi-Webcam-Server-and-Stream-/) - mentions `motion`, worth checking out.
+* [flutter-webrtc-server](https://github.com/flutter-webrtc/flutter-webrtc-server)
+* [uv4l-server](https://www.linux-projects.org/documentation/uv4l-server/)
+* [How to Build a Video Call & Voice Chat App in WebRTC Using Javascript/node.js?](https://medium.com/hackernoon/how-to-build-a-video-call-voice-chat-app-in-webrtc-using-javascript-node-js-d256d434acbc)
+* [GStreamer WebRTC: A flexible solution to web-based media](https://opensource.com/article/19/1/gstreamer)
+* [WebRTC Native C++ to Browser Video Streaming Example](https://sourcey.com/articles/webrtc-native-to-browser-video-streaming-example)
+
+
+## Trial and Error
+
 1. `$ gst-launch-1.0 nvarguscamerasrc sensor_id=0 ! nvoverlaysink`
 
 ```
