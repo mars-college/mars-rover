@@ -13,7 +13,7 @@
 
 * running `$ cmake .` alerted me to a missing dependency: `libjpeg`, which meant I needed to install `libjpeg-dev`... things they don't tell you in school...
 
-* Figured it'd be a snap to test with the python_bindings provided in the repo. ran `$ python3 setup.py clean built install`, then `$ python3 test.py`. Was missing the package `traitlets`, installed with `$ pip3 isntall traitlets`. Seemed to work... until I can to a
+* Figured it'd be a snap to test with the python_bindings provided in the repo. ran `$ python3 setup.py clean built install`, then `$ python3 test.py`. Was missing the package `traitlets`, installed with `$ pip3 install traitlets`. Seemed to work... needs GTK though or some other window manager.
 
 ### 2x Wide Angle Lens for Jetson Nano
 

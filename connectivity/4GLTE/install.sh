@@ -2,7 +2,8 @@
 
 # Install files and scripts for simcom_wwan@.service
 
-SCRIPT_FILE="wwan_preup.sh"
+PRE_SCRIPT_FILE="wwan_preup.sh"
+POST_SCRIPT_FILE="wwan_postdown.sh"
 SCRIPT_PATH="/etc/simcom_wwan"
 SERVICE_PATH="/lib/systemd/system"
 SERVICE_FILE="simcom_wwan@.service"
@@ -21,14 +22,16 @@ else
 	mkdir "$SCRIPT_PATH"
 fi
 
-echo "[+] Copying wann_preup.sh to $SCRIPT_PATH"
-cp "./$SCRIPT_FILE" "$SCRIPT_PATH"
-echo "[+] Copying sincom_wwan@.service to $SERVICE_PATH"
+echo "[+] Copying $PRE_SCRIPT_FILE to $SCRIPT_PATH"
+cp "./$PRE_SCRIPT_FILE" "$SCRIPT_PATH"
+
+echo "[+] Copying $POST_SCRIPT_FILE to $SCRIPT_PATH"
+cp "./$POST_SCRIPT_FILE" "$SCRIPT_PATH"
+
+echo "[+] Copying $SERVICE_FILE to $SERVICE_PATH"
 cp "./$SERVICE_FILE" "$SERVICE_PATH"
 
 echo "[+] Reloading systemd manager configuration"
 systemctl daemon-reload
-echo "[+] Enabling $SERVICE"
-systemctl enable "$SERVICE"
-systemctl start "$SERVICE"
-systemctl status "$SERVICE"
+echo "[+] Successfully installed $SERVICE_FILE!"
+echo "[+] To start, run: $ sudo systemctl start simcom_wwan@$IFACE.service"

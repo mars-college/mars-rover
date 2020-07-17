@@ -2,7 +2,6 @@
 
 # Uninstall files and scripts for simcom_wwan@.service
 
-SCRIPT_FILE="wwan_preup.sh"
 SCRIPT_PATH="/etc/simcom_wwan"
 SERVICE_PATH="/lib/systemd/system"
 SERVICE_FILE="simcom_wwan@.service"
@@ -14,9 +13,10 @@ if [ "$EUID" -ne 0 ]
   exit 1
 fi
 
-systemctl disable "$SERVICE"
+echo "[+] Stopping $SERVICE_FILE"
 systemctl stop "$SERVICE"
-systemctl status "$SERVICE"
+echo "[+] Disabling $SERVICE_FILE"
+systemctl disable "$SERVICE"
 
 if [[ -d "$SCRIPT_PATH" ]]; then
 	echo "[+] Removing $SCRIPT_PATH"
