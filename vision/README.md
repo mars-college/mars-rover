@@ -3,7 +3,7 @@ Vision demo
 
 Install required packages.
 
-    pip install aiohttp aiortc opencv-python numpy Pillow
+    pip3 install aiohttp aiortc opencv-python numpy Pillow
 
 Start the server.
 
