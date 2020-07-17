@@ -15,7 +15,6 @@ thread_lock = threading.Lock()
 # GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=3280, height=2464, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=0 ! video/x-raw, width=960, height=616, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink wait-on-eos=false max-buffers=1 drop=True'
 GSTREAMER_PIPELINE = 'nvarguscamerasrc sensor_id=0 ! video/x-raw(memory:NVMM), width=3280, height=2464, format=NV12, framerate=21/1 ! nvvidconv flip-method=0 ! videoconvert ! video/x-raw, format=(string)BGR ! appsink wait-on-eos=false max-buffers=1 drop=True'
 
-
 # Create the Flask object for the application
 app = Flask(__name__)
 
@@ -77,3 +76,4 @@ if __name__ == '__main__':
         app.run("0.0.0.0", port=8080)
     except Exception as e:
         print(e)
+
