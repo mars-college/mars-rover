@@ -27,7 +27,7 @@ def send_i2c_data(address, data):
 
 def set_power(drive, turn):
 
-  if drive > 0:
+  if drive < 0:
     left_power = drive + turn
     right_power = drive - turn
   else:
