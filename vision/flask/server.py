@@ -2,7 +2,6 @@ import cv2
 import time
 import threading
 from flask import Response, Flask
-# pip3 install opencv-python flask
 
 # Image frame sent to the Flask object
 global video_frame
@@ -13,7 +12,9 @@ global thread_lock
 thread_lock = threading.Lock()
 
 # GStreamer Pipeline to access the Raspberry Pi camera
-GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=3280, height=2464, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=0 ! video/x-raw, width=960, height=616, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink wait-on-eos=false max-buffers=1 drop=True'
+# GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=3280, height=2464, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=0 ! video/x-raw, width=960, height=616, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink wait-on-eos=false max-buffers=1 drop=True'
+GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=3280, height=2464, format=NV12, framerate=21/1 ! nvvidconv flip-method=0 ! videoconvert ! video/x-raw, format=(string)BGR ! appsink wait-on-eos=false max-buffers=1 drop=True'
+
 
 # Create the Flask object for the application
 app = Flask(__name__)
@@ -62,15 +63,17 @@ def streamFrames():
 
 # check to see if this is the main thread of execution
 if __name__ == '__main__':
+    try:
+        # Create a thread and attach the method that captures the image frames, to it
+        process_thread = threading.Thread(target=captureFrames)
+        process_thread.daemon = True
 
-    # Create a thread and attach the method that captures the image frames, to it
-    process_thread = threading.Thread(target=captureFrames)
-    process_thread.daemon = True
+        # Start the thread
+        process_thread.start()
 
-    # Start the thread
-    process_thread.start()
-
-    # start the Flask Web Application
-    # While it can be run on any feasible IP, IP = 0.0.0.0 renders the web app on
-    # the host machine's localhost and is discoverable by other machines on the same network 
-    app.run("0.0.0.0", port=8080)
+        # start the Flask Web Application
+        # While it can be run on any feasible IP, IP = 0.0.0.0 renders the web app on
+        # the host machine's localhost and is discoverable by other machines on the same network 
+        app.run("0.0.0.0", port=8080)
+    except Exception as e:
+        print(e)
