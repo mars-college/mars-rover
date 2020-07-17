@@ -2,6 +2,8 @@
 
 ### WARNING: Currently Untested! It's *mostly* complete, but not yet verified. Proceed at your own risk!
 
+![](images/rover_02-2410.jpg)
+
 This walkthrough covers steps to setting up remote control of a Mountain Ark SR-08 robotic tank platform with a Jetson Nano over WebSockets on a local WiFi network.
 
 Some hardware setup is not covered in detail.
@@ -57,6 +59,8 @@ To reproduce the project in its entirety, you'll need to have access to an elect
 * `tornado` python web server framework
 
 ## Let's Built It!
+
+![](images/rover_02-2412.jpg)
 
 ### Assemble TR-08 Tank Platform
 
