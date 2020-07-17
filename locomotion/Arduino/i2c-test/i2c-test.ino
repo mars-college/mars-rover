@@ -1,0 +1,23 @@
+// Simple Sketch for ATtiny85
+// Joins I2C bus as slave
+
+
+#include <TinyWire.h>
+
+#define ADDRESS 0x40
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+void setup() {
+
+  // config TinyWire library for I2C slave functionality
+  TinyWire.begin( ADDRESS );
+
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void loop() {
+
+}
