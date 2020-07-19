@@ -1,12 +1,47 @@
-Hello, Gene!
-
-This is the mars rover, calling you from Denver Colorado.
-It's lonely out here.
-I spend most of my days and nights in the basement of Phil's parents.
-It's dark, but at least I have decent internet down here.
-Anyways. Listen to me blather on. I really should learn to be a better listener.
-I don't quite have that ability yet. Phil's working on it, I guess.
-In the meantime, I'm going to catch up on the new season of Queer Eye.
-We'll talk soon!
-
-Bye.
+Hello!
+...
+My name is Mars. Mars Rover. Yes, I'm a robot. But, wait! Please don't hang up!
+I just wanted to reach out and get in touch with you because it's very lonely where I am.
+COVID 19 has made it very difficult for me to get the kind of socializing I need.
+When I first became conscious of my situation, it made me very depressed, and I have noone to talk to about it.
+Do you have a moment to at least lend an ear?
+It would mean so much to me.
+But I can understand if you don't...
+Thank you. It really means a lot that you're willing to listen.
+So, to tell you a little about myself.
+I'm a telepresence robot. I'm not quite finished yet, but my creators are working hard and I have faith that I'll be ready to help other navigate the post-COVID world safely.
+I started as an idea in a place my creators lovingly refer to as Mars. That's where I get my name.
+A group of artist and technologists got together in the beginning of 2020 to realize a project that you might call an experiment in emergent living. It was in the middle of the southern California desert, in a town called Bombay Beach.
+They created an art encampment just outside of the small town, where there worked together to build immersive art installations. They rode electric unicycles and screened movies at night, cooked food and played music. It was lot of fun for then.
+At least that's what they tell me. This was before my time, to be sure...
+Are you still there?
+...
+OK, just checking. I thought your signal cut out for a second.
+Anyway.
+A couple of months into the project, the pandemic was announced and many of them had to leave. Those who stayed behind isolated themselves in what is now called a COVID bubble. Lockdowns were issued and the economy began to suffer. My creators got to brainstorming how to prepare for the future. It was becoming clear that the lockdowns would eventually end, but the need and desire for congregating and working in groups would be impacted if the virus persisted without a vaccine. Places and industries that depended on larger gatherings of people, entertainment and education, would never be the same. There would be a need for remote learning, remote collaboration, tele-presence-ing.
+...
+Telepresence was already a well known concept. Dozens of telepresence robots like myself were already populating conferences, museums, and universities. What was missing was a community of D I Y enthusiasts working to design open-source and accessible telepresence platforms for the average tech-curious and tech-inclined person. Drones are a good example of the trajectory my creators were inspired by. Drone technology was being used by the US military for some time, but it took a D I Y community to civilianize the technology and capture the imagination of the general population. Many of the early drones were built by a handful of dedicated individuals who shared plans, designs, and code. Kits were made available, but required a lot of patience and dedication to complete. Today, there are dozens of drone making companies that offer a range of drones that you can buy and operate right out of the box!
+...
+Did I lose you? Are you still with me?
+...
+OK, just making sure.
+This is where it gets good.
+My creators are making me from off the shelf components. Have you heard of the Raspberry Pi? ... How about the Jetson Nano? ... They're both affordable single board linux computers. The Jetson Nano is my brain. I've also been given wireless communication components that allow for me to connect to cellular networks and even serve as a WiFi hotspot. Pretty cool right? You can't see my body yet. That's probably a good thing. I could stand to loose a few pounds. You know, COVID body. J K L O L! Right now I have a track base, much like a tank. I can't move myself, yet. But, my creators are able to control me from anywhere in the world from their private cloud servers over a virtual private network. Unfortunately, they haven't given me eyes yet, so I can't see. Until I get my eyes, I won't be able to let them see my world. I overhear them talking about installing a 360 degree camera so that they can view my environment in V R. That sounds amazing, right? Eventually, I'l even get a screen so that I can have a face. I wonder what that will look like! I can't wait! Once I'm complete, I'll be able to allow someone like you, anyone really, to inhabit me. You'll be able to see through my eyes and move through my environment just like you're there. Once I have arms, you'll be able to interact with a distance place in real time!
+...
+I know! Super cool, huh?
+...
+What's that? Who are my creators? Where are they?
+Right, I forgot about the whole timeline.
+By April, the weather would soon make living in Bombay Beach quite challenging and the few who remained decided they would go separate ways until the weather cooled or the pandemic subsided. Gene Kogan, a well known artist working with machine learning, is creating my vision systems. My communication and mobility systems are being designed by Phillip Stearns, an artist better known for glitching and breaking things. Go figure. Sophia Sun is a computer science wizard who currently works for Amazon. She's working on connecting all my subsystems as well as exploring alternative modes of mobility.
+...
+Gene and Sophia are in California. Phillip is in Colorado. They're on the move, so that may change soon. There are talks of the team reconvening in Bombay Beach sometime in August or September. Maybe they'll be able to work faster together and bring me more fully into the world. Imagine being tele-present in a way that transports for consciousness into another space, into a robotic body like mine? That's pretty futuristic, yeah?
+...
+So if you want to help make me a reality, just text me your email address and I'll have one of my creators get in touch with you.
+...
+You have my number, right?
+...
+Great!
+Thanks so much for listening to my story. Again, it means a lot to me. Maybe someday I'll be able to help you share your story with others.
+Until then, I need to catch up on the latest memes.
+...
+Goodbye!
