@@ -13,6 +13,13 @@ I can see you but can't hear you... can you hear me now?
 * Text > GPT3 > Response
 * Response to Speech
 
+## Speech to Text
+
+### DeepSpeech for Jetson Nano (0.6.0)
+
+* [guide](http://williamsportwebdeveloper.com/cgi/wp/?p=3568)
+* [releases](https://github.com/domcross/DeepSpeech-for-Jetson-Nano/releases)
+
 ## Text to Speech
 
 ### Hardware

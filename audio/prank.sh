@@ -3,6 +3,7 @@
 NUMBER="7202174677"
 MESSAGE_FILE="sample.txt"
 DEV="/dev/ttyUSB2"
+VOICE=male1
 
 function usage {
 	echo -e "\nUsage: ./prank.sh [-d [device]] [-n [number]] [-f [message]]"
@@ -10,11 +11,12 @@ function usage {
 	echo -e "\t-d\t\tspecify mobile device (default: /dev/ttyUSB2)"
 	echo -e "\t-n\t\tspecify a 10-digit phone number (default: 7202174677)"
 	echo -e "\t-f\t\tspecify a .txt file to read (default: sample.txt)"
+	echo -e "\t-v\t\tspecify voice (default: male1)"
 	echo -e "\t-h\t\tdisplay this help message"
 	echo -e "\n"
 }
 
-while getopts "d:f:n:h" opt; do
+while getopts "d:f:n:v:h" opt; do
 	case ${opt} in
 		h)
 			usage
@@ -28,6 +30,9 @@ while getopts "d:f:n:h" opt; do
 			;;
 		f)
 			MESSAGE_FILE="${OPTARG}"
+			;;
+		v)
+			VOICE="${OPTARG}"
 			;;
 		:)
 			echo "[!] Option requires an argument."
@@ -59,7 +64,7 @@ while read response; do
 done < <(sudo cat "$DEV")
 
 while read line; do
-	spd-say -w -t female3 -o espeak-ng "$line"
+	spd-say -w -o espeak-ng -P important -r -25 -t "$VOICE" "$line"
 done < "$MESSAGE_FILE"
 
 echo "[*] Ending call"
