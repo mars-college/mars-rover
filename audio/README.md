@@ -22,6 +22,9 @@ I can see you but can't hear you... can you hear me now?
 
 ## Text to Speech
 
+* [ISAAC](https://docs.nvidia.com/isaac/isaac/packages/audio/doc/text_to_speech.html)
+* Builtin Linux Tools: `spd-say, say, etc...`
+
 ### Hardware
 
 1. Plug in the Sabrent USB External Stereo Sound Adapter.
@@ -46,3 +49,7 @@ You'll need two terminal windows.
 1. `$ sudo /bin/bash -c "echo -e \"AT+CHUP\r\" > /dev/ttyUSB2"` ends the call.
 
 * All of this is scripted in `prank.sh`
+
+## Quirks
+
+The cheapo USB Audio dongle at times needed to be reset. Not sure if this is because of power saving settings. I [found a way](https://askubuntu.com/questions/645/how-do-you-reset-a-usb-device-from-the-command-line) to reset the device, which seemed to bring it back online. A bit kludgy and hopefully something that a future higher quality device won't require. Another possible soultion is [here](http://billauer.co.il/blog/2013/02/usb-reset-ehci-uhci-linux/).
