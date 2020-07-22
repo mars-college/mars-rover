@@ -10,8 +10,11 @@ I can see you but can't hear you... can you hear me now?
 
 * Speech to Text
 	* [DeepSpeech on the Jetson Nano](http://williamsportwebdeveloper.com/cgi/wp/?p=3568)
+	* [https://cloud.google.com/speech-to-text/docs/streaming-recognize#speech-streaming-recognize-python](https://cloud.google.com/speech-to-text/docs/streaming-recognize#speech-streaming-recognize-python)
+	* [https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/speech/microphone/transcribe_streaming_infinite.py](https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/speech/microphone/transcribe_streaming_infinite.py)
 * Text > GPT3 > Response
 * Response to Speech
+
 
 ## Speech to Text
 
@@ -19,6 +22,35 @@ I can see you but can't hear you... can you hear me now?
 
 * [guide](http://williamsportwebdeveloper.com/cgi/wp/?p=3568)
 * [releases](https://github.com/domcross/DeepSpeech-for-Jetson-Nano/releases)
+* [Official Official TensorFlow for Jetson Nano!](https://forums.developer.nvidia.com/t/official-tensorflow-for-jetson-nano/71770/143)
+* [NVIDIA Guide]()
+
+#### Install Tensorflow 1.14 for Jetson Nano. 
+
+* Assumes that JetPack is installed
+
+Install system packages required by TensorFlow:
+
+1. `$ sudo apt-get update`
+1. `$ sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran`
+
+Install and upgrade pip3.
+
+1. `$ sudo apt-get install python3-pip`
+1. `$ sudo pip3 install -U pip testresources setuptools`
+
+Install the Python package dependencies.
+
+1. `$ sudo pip3 install -U numpy==1.16.1 future==0.17.1 mock==3.0.5 h5py==2.9.0 keras_preprocessing==1.0.5 keras_applications==1.0.8 gast==0.2.2 futures protobuf pybind11`
+
+"This DeepSpeech release requires Tensorflow 1.14. Luckily there is a official TF-release from Nvidia that works perfectly, so no compiling this time..." but the only version <2 available is 1.15? I'm running with Jetpack 4.4 installed so, my installation command is:
+
+1. `$ sudo pip3 install --pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v44 tensorflow==1.15.2+nv20.6`
+
+1. `$ wget https://github.com/domcross/DeepSpeech-for-Jetson-Nano/releases/download/v0.6.0/deepspeech-0.6.0-cp36-cp36m-linux_aarch64.whl`
+1. `$ sudo python3 -m pip install deepspeech-0.6.0-cp36-cp36m-linux_aarch64.whl`
+1. `$ wget https://github.com/domcross/DeepSpeech-for-Jetson-Nano/releases/download/v0.6.0/libdeepspeech.so`
+1. `$ sudo mv libdeepspeech.so /usr/local/lib`
 
 ## Text to Speech
 

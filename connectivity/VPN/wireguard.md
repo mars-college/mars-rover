@@ -87,7 +87,8 @@ Adapted from the [guide](https://www.wireguard.com/compilation/) on the official
 1. Change to your home directory: `$ cd`
 1. Make a folder named `.wg`: `$ mkdir .wg`
 1. Change directories to `.wg`: `$ cd .wg`
-1. Generate the public and private keys:
+1. Prevent other users from accessing the keys: `$ umask 077`
+1. Generate the public and private keys: `$ wg genkey | tee privatekey | wg pubkey > publickey`
  
 ### Server (Static IP)
 
@@ -114,7 +115,7 @@ PersistentKeepalive = 20
 ```
 [Interface]
 # Name = Client
-Address = <SERVER_ADMIN_ASSIGNED_VPN_LOCAL_IP_ADDRESS>/<SUBNET>
+Address = <SERVER_ADMIN_ASSIGNED_VPN_LOCAL_IP_ADDRESS>/32
 PrivateKey = <based64 private key DO NOT EVER SHARE EVER!!!>
 
 [Peer]
