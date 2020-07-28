@@ -80,7 +80,7 @@ You'll need two terminal windows.
 1. say gives you slightly more control over the voice characteristics: `while read line; do say "$line";done < sample.txt`
 1. `$ sudo /bin/bash -c "echo -e \"AT+CHUP\r\" > /dev/ttyUSB2"` ends the call.
 
-* All of this is scripted in `prank.sh`
+* All of this is scripted in `call.sh`
 
 ## Quirks
 
