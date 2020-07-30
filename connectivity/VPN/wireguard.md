@@ -148,3 +148,10 @@ Server to Client? Skip to the second step.
 1. Test the connection to server: `$ ping -c 5 <SERVER_VPN_IP_ADDRESS>`
 1. Test the connection to other client: `$ ping -c 5 <CLIENT_VPN_IP_ADDRESS>`
 1. Login to the other client: `$ ssh <USER>@<CLIENT_VPN_IP_ADDRESS>`
+
+## Persistence
+
+On the client-side, it might help to add the following line to your cron jobs to make sure your connection holds through ISP ip reassignments:
+
+1. `$ sudo crontab -e`
+1. add: `@hourly /bin/systemctl restart wg-quick@wg0.service`
