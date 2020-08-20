@@ -8,7 +8,7 @@ The guide and related files that were original put together for this project has
 
 ## Modifications
 
-If using [Wireguard VPN](https://github.com/brahman-ai/mars-rover/blob/master/connectivity/wireguard/README.md) as setup in the guides for this project, it will be necessary to modify the `simcom_wwan@.service` file to include:
+If using [Wireguard VPN](../wireguard/README.md) as setup in the guides for this project, it will be necessary to modify the `simcom_wwan@.service` file to include:
 
 
 ```
