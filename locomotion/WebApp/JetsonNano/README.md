@@ -164,8 +164,14 @@ Programmer: "USBtinyISP
 
 1. Insert the ATTiny85s into the breadboard and use jumpers to connect them to the `+3.3V` and `GND` rails.
 1. Use jumpers to connect their `SDA` and `SCL` pins together for form SDA and SCL I2C "busses"
-1. Connect the SDA bus to pin 3 of the Jetson Nano J-41 40-pin header.
-1. Connect the SCL bus to pin 5 of the Jetson Nano J-41 40-pin header.
+
+![](images/attiny85.jpeg)
+
+1. Connect the SDA bus to BOARD pin 3 (BCM 2) of the Jetson Nano J-41 40-pin header.
+1. Connect the SCL bus to BOARD pin 5 (BCM 3) of the Jetson Nano J-41 40-pin header.
+
+![](images/nano-gpio.png)
+
 1. Connect `pin 6` of the "LEFT" ATTiny85 to the `PWMA` pin on the Motor Driver.
 1. Connect `pin 1` of the "LEFT" ATTiny85 to the `AIN1` pin on the Motor Driver.
 1. Connect `pin 2` of the "LEFT" ATTiny85 to the `AIN2` pin on the Motor Driver.
@@ -225,5 +231,15 @@ Optionally install and manage as a `systemd` service, `rover.service` using `ins
 1. Make sure you know the IP address of your Nano: `$ ifconfig wlan0`
 1. Open a browser on your host (make sure you have JavaScript enabled!) and navigate to: `http://<your_pi_IP_Address>:80`
 1. Check the WebSocket status in the bottom and make sure it reads `connected`. If not, open the WebConsole (Firefox) and look for errors.
+
+* If connecting via WiFi direct (see instructions for setting up a [wireless access point](../../../connectivity/wifi/8265ac/README.md)), navigate to the Jetson Nano's "router address".
+
+* If connecting via VPN (see instructions for setting up connection to an [existing network](../../../connectivity/wifi/pau05/README.md) or [4GLTE](../../../connectivity/sim7600g-h/README.md), and [Wireguard VPN](../../../connectivity/wireguard/README.md))
+	1. Connect to the Wireguard VPN server
+	1. Navigate to the IP address the Jetson Nano was configured to use as its VPN client IP.
+
+You should see this page:
+
+![](images/connected.jpg)
 
 The joystick GUI element should now move the robot around!
