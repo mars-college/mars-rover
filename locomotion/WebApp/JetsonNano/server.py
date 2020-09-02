@@ -40,10 +40,10 @@ def set_power(drive, turn):
   turn = constrain( turn, -1.0 ,1.0) * 256
 
   # cacluate power
-  if drive <= 0:
+  if drive <= 0: # forward
     left_power = drive + turn
     right_power = drive - turn
-  else:
+  else: # reverse
     left_power = drive - turn
     right_power = drive + turn
 
@@ -58,7 +58,10 @@ def set_power(drive, turn):
   else:
     right_direction = False
 
-  # send direction changes only (not sure if this is entirely necessary)
+  # send direction changes only 
+  # I2C spam suppression
+  # not sure if this is entirely necessary
+  # eliminate some redundancy
   if left_direction != left_direction_last:
     send_i2c_data( ADDRESSES[0], [ ord('d'), int(left_direction) ] )
 
