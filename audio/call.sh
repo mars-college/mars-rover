@@ -1,12 +1,12 @@
 #!/bin/bash
 
-NUMBER="7202174677"
+NUMBER=""
 MESSAGE_FILE="sample.txt"
 DEV="/dev/ttyUSB2"
 VOICE=male1
 
 function usage {
-	echo -e "\nUsage: ./prank.sh [-d [device]] [-n [number]] [-f [message]]"
+	echo -e "\nUsage: ./call.sh [-d [device]] [-n [number]] [-f [message]]"
 	echo -e "NOTE: Some network changes require your password"
 	echo -e "\t-d\t\tspecify mobile device (default: /dev/ttyUSB2)"
 	echo -e "\t-n\t\tspecify a 10-digit phone number (default: 7202174677)"
