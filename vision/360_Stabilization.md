@@ -50,5 +50,21 @@ This is theoretical, but maybe something exists. The full software approach whic
 
 * [https://github.com/careyer/Insta360-Air-remap](https://github.com/careyer/Insta360-Air-remap)
 * [https://engineering.fb.com/2016/08/31/ai-research/360-video-stabilization-a-new-algorithm-for-smoother-360-video-viewing/](https://engineering.fb.com/2016/08/31/ai-research/360-video-stabilization-a-new-algorithm-for-smoother-360-video-viewing/)
-* [johanneskopf.de/publications/omnistab/360_video_stabilization.pdf]()
+* [johanneskopf.de/publications/omnistab/360_video_stabilization.pdf](johanneskopf.de/publications/omnistab/360_video_stabilization.pdf)
 
+### Sensors
+* [https://www.sparkfun.com/products/15335](https://www.sparkfun.com/products/15335)
+* [https://www.sparkfun.com/products/13944](https://www.sparkfun.com/products/13944)
+* [https://www.sparkfun.com/products/13284](https://www.sparkfun.com/products/13284)
+
+### Pros
+
+* Hardware without moving parts
+* Should reduce processing overhead (skip analysis)
+* Less expensive than pure hardware
+
+### Cons
+
+* Slightly more expensive
+* We got to Frankenstein some shit together
+* Still have to deal with hardware
