@@ -51,6 +51,7 @@ This is theoretical, but maybe something exists. The full software approach whic
 * [https://github.com/careyer/Insta360-Air-remap](https://github.com/careyer/Insta360-Air-remap)
 * [https://engineering.fb.com/2016/08/31/ai-research/360-video-stabilization-a-new-algorithm-for-smoother-360-video-viewing/](https://engineering.fb.com/2016/08/31/ai-research/360-video-stabilization-a-new-algorithm-for-smoother-360-video-viewing/)
 * [johanneskopf.de/publications/omnistab/360_video_stabilization.pdf](johanneskopf.de/publications/omnistab/360_video_stabilization.pdf)
+* [http://paulbourke.net/dome/dualfish2sphere/](http://paulbourke.net/dome/dualfish2sphere/)
 
 ### Sensors
 * [https://www.sparkfun.com/products/15335](https://www.sparkfun.com/products/15335)
