@@ -80,6 +80,11 @@ def set_power(drive, turn):
 def constrain( _val, _min, _max):
   return min(_max, max(_min,_val))
 
+# Note to future self: Make the Atmega code for the motor control more robust...
+# 1. Make the communication bi-directional, indicating whether speed was received and applied correctly
+# 2. By default, the motor speed should be set to 0 unless the speed was successfully applied
+# 3. If necessary, develop an error code so this server knows what to do when things go wrong in different ways
+
 def send_i2c_data(address, data):
   try:
     bus.write_i2c_block_data( address, 0, data )
@@ -154,8 +159,16 @@ if __name__ == "__main__":
         print ("Tornado Server started")
         main_loop.start()
 
-    except:
+    except Exception as e:
+        # Just incase the motors didn't get the message to stop...
+        set_power( 0.0, 0.0 )
+        # Ooops message
         print ("")
         print ("Exception triggered - Tornado Server stopped.")
+        print ("---------------------------------------------")
+        print (e)
+        print ("---------------------------------------------")
+        print ("Have a nice day! :)")
+
 
 #End of Program
