@@ -12,7 +12,8 @@ Let's keep things organized by individuals:
 
 ## Gene's Parts
 
-nothing here yet...
+* Jetson Nano
+* Ricoh Theta S
 
 ## Sophia's Parts
 
@@ -99,7 +100,22 @@ Resources:
 ### 4GLTE SIM
 
 * [Mint](https://www.mintmobile.com) - $45 introductory offer for 3mos of 3GB/mo 4GLTE data
+	* Considering Purchasing the top level plan for a year once we have video streaming leveled up.
 
 ### ATTiny85
 
 * 2x [ATTiny85](https://www.mouser.com/productdetail/microchip-technology-atmel/attiny85-20pu?qs=8jWQYweyg6NCiiaOb5GI9Q%3D%3D)
+
+### Accelerometer & Gyroscope Modules
+
+* 1x [HiLetgo 3pcs GY-521 MPU-6050 MPU6050 3 Axis Accelerometer Gyroscope Module 6 DOF 6-axis Accelerometer Gyroscope Sensor Module 16 Bit AD Converter Data Output IIC I2C for Arduino](https://www.amazon.com/gp/product/)
+
+### Game Controllers
+
+* 1x [DarkWalker Wireless Bluetooth Controller, Mobile Controller for iOS 13 or Later Support MFI-Compatible Games - Android 10 Cloud Gaming Support Xcloud Stadia Shadow - PS4](https://www.amazon.com/gp/product/B088KF3Z9R/)
+
+### USB Audio Interface
+
+### 2x Stereo to Dual-Mono Y splitter
+
+### 2x Audio Cables
