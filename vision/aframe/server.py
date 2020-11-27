@@ -20,6 +20,11 @@ ROOT = os.path.dirname(__file__)
 pcs = set()
 
 
+# just for testing rotation params with mouse
+import pyautogui
+
+
+
 class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
 
     def __init__(self, camera_id):
@@ -53,6 +58,11 @@ class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
             fragment_shader=open('equirectangular.frag', 'r').read()
         )
 
+        # set constants
+        self.prog['FOV'].value = 3.14159265358979
+        self.prog['CAMERA_COEFF'].value = 0.88175
+
+
     async def recv(self):
         pts, time_base = await self.next_timestamp()
         ret, frame = self.cap.read()
@@ -65,6 +75,11 @@ class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
             components=3, 
             data=frame.tobytes()
         )
+
+        x, y = pyautogui.position()[0], pyautogui.position()[1]
+        self.prog['yaw'].value = float(x-800+00)/400.0
+        self.prog['pitch'].value = float(y-800+00)/500.0
+        self.prog['roll'].value = float(y-800+00)/600.0
 
         self.tex.use()
         self.ctx.clear(1.0, 1.0, 1.0)

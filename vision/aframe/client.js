@@ -53,8 +53,14 @@ function start_client(use_stun) {
     // connect audio / video
     pc.addEventListener('track', function(evt) {
         if (evt.track.kind == 'video') {
-            document.getElementById('video').srcObject = evt.streams[0];
+            console.log("received at vid");
+            var zzz = evt.streams[0];
+            console.log(zzz);
+            document.getElementById('video').srcObject = zzz;
         } else {
+            console.log("received at aud ");
+            var zzz = evt.streams[0];
+            console.log(zzz);
             document.getElementById('audio').srcObject = evt.streams[0];
         }
     });

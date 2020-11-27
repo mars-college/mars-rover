@@ -9,45 +9,105 @@ precision mediump float;
 precision mediump int;
 #endif
 
+#define HALF_PI 1.57079632679489
 #define PI 3.14159265358979
-#define _THETA_S_Y_SCALE	(640.0 / 720.0)
+#define TWO_PI 6.28318530717958
+#define _THETA_S_Y_SCALE (640.0/720.0)
 
-//uniform vec4 uvOffset;
+// field of view of the fisheye
+uniform float FOV;  
+uniform float CAMERA_COEFF;
+
+// rotation parameters
+uniform float yaw;
+uniform float pitch;
+uniform float roll;
+
 
 void main() {
-    vec4 uvOffset = vec4(0);
-    float radius = 0.445;
 
-    vec2 revUV = pos.xy;
-    if (pos.x <= 0.5) {
-        revUV.x = revUV.x * 2.0;
+    // pos is desired point in equirectangular plane
+    // map each fisheye to uv [0.25, 0.75] 
+    vec2 uv = pos.xy;
+    if (pos.x > 0.5) {
+        uv.x = -0.25 + pos.x;
     } else {
-        revUV.x = (revUV.x - 0.5) * 2.0;
+        uv.x = 0.25 + pos.x;
+    }
+
+    // longitude, -pi to pi
+    // latitude, -pi/2 to pi/2
+    float lng = TWO_PI * (uv.x-0.5);  
+ 	float lat = PI * (uv.y-0.5);	      
+
+    // convert to ray in 3d space
+    vec3 P = vec3(
+        cos(lat) * sin(lng),
+	    cos(lat) * cos(lng),  
+	    sin(lat) 
+    );
+
+    // rotate P 
+    float p = pitch;
+    float r = roll;
+    float y = yaw;
+    if (pos.x >= 0.5) {
+        r *= -1.0;
+        p *= -1.0;
+    }
+
+    mat3 rot = mat3( cos(y)*cos(p),   cos(y)*sin(p)*sin(r) - sin(y)*cos(r),  cos(y)*sin(p)*cos(r) + sin(y)*sin(r), 
+                     sin(y)*cos(p),   sin(y)*sin(p)*sin(r) + cos(y)*cos(r),  sin(y)*sin(p)*cos(r) - cos(y)*sin(r), 
+                    -sin(p),          cos(p)*sin(r),                         cos(p)*cos(r) );
+
+    vec3 P_rot = rot * P;
+
+    // derive latitude and longitude of rotated point
+    float lat2 = acos(P_rot.z);
+    float lng2 = atan(P_rot.y, -P_rot.x);
+
+    // re-map to equirectangular    
+    vec2 pos_rot = vec2((lng2+PI)/TWO_PI, lat2/PI);
+    
+    // re-map new pos_rot to uv again
+    uv = pos_rot.xy;
+    if (pos_rot.x > 0.5) {
+        uv.x = -0.25 + pos_rot.x;
+    } else {
+        uv.x = 0.25 + pos_rot.x;
     }
     
-    revUV *= PI;
+    // get latitude and longitude in equirectangular plane again
+    lng = 2.0 * PI * (uv.x-0.5);  
+    lat = PI * (uv.y-0.5);
 
-    vec3 p = vec3(cos(revUV.x), cos(revUV.y), sin(revUV.x));
-    p.xz *= sqrt(1.0 - p.y * p.y);
+    // convert to ray in 3d space again
+    P = vec3(
+        cos(lat) * sin(lng),
+	    cos(lat) * cos(lng),  
+	    sin(lat) 
+    );
 
-    float r = 1.0 - asin(p.z) / (PI / 2.0);
-    vec2 st = vec2(p.y, p.x);
+    // convert to fisheye space
+    float theta = atan(P.z, P.x);
+    float phi = atan(sqrt(P.x*P.x + P.z*P.z), P.y);
+    float radius = CAMERA_COEFF * phi / FOV;
 
-    st *= r / sqrt(1.0 - p.z * p.z);
-    st *= radius;
-    st += 0.5;
-    
-    if (pos.x <= 0.5) {
-        st.x *= 0.5;
-        st.x += 0.5;
-        st.y = 1.0 - st.y;
-        st.xy += uvOffset.wz;
-    } else {
-        st.x = 1.0 - st.x;
-        st.x *= 0.5;
-        st.xy += uvOffset.yx;
+	// Pixel in fisheye space
+    vec2 pfish = vec2(
+        0.5 + radius * cos(theta),
+        0.5 + radius * sin(theta)
+    );
+    pfish.x *= 0.5;
+
+    // when to sample the texture
+    if ((pos.x>0.5 && lng2>0) || (pos.x<0.5 && lng2<=0)) {
+        pfish.x += 0.5;
     }
-    
-    st.y = st.y * _THETA_S_Y_SCALE;
-    f_color = vec4(texture(textureObj, st).rgb, 1.0);
+
+    // scale Y for theta
+    pfish.y = pfish.y * _THETA_S_Y_SCALE;   
+
+    // sample the color
+    f_color = vec4(texture(textureObj, pfish).rgb, 1.0);
 }
