@@ -11,18 +11,19 @@
 
 float motor_ease = 0.25;
 float motor_speed = 0; // actual motor speed (0-255)
-int target_speed = 0; // target motor speed (0-255)
-
+uint8_t target_speed = 0; // target motor speed (0-255)
+byte dir = 0;
 //////////////////////////////////////////////////////////////////////////////
 
 void setup() {
 
   //  warning: this contains cryptic register settings for the ATTiny85 timers
+  //  refer to the ATTiny85 Datasheet/Manual for details
 
   cli(); // clear interrupts
 
   // Pulse Width Modulator B Enable, OCR1B cleared on compare match
-//  GTCCR = 0b01100000; // PB4 enabled
+  //  GTCCR = 0b01100000; // PB4 enabled
   GTCCR = 0b01000000; // PB4 disabled
 
   // timer0 PWM freqeuncy ~8Khz (16Mhz / 256 / 8)
@@ -46,7 +47,7 @@ void setup() {
   TinyWire.begin( ADDRESS );
   // sets callback for the event of a slave receive
   TinyWire.onReceive( onI2CReceive );
-
+  TinyWire.onRequest( onI2CRequest );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -62,22 +63,45 @@ ISR(TIM1_COMPA_vect) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-
-void onI2CReceive() {
+int onI2CReceive() {
   byte data = 0;
+
+  // loop through all the data
   while ( TinyWire.available() > 0 ) {
+    
     //read first byte in the buffer
     data = TinyWire.read();
     // if there are at least 1 more bytes, run the check
     if (TinyWire.available() > 0) {
       if (data == 'p') {
         target_speed = TinyWire.read();
+        TinyWire.write(String("Got: ").concat(String(target_speed)));
       } else if (data == 'd') {
-        setDirection( TinyWire.read() );
+        dir = TinyWire.read();
+        setDirection( dir );
+        TinyWire.write(String("Got: ").concat(String(dir)));
+      } else {
+        // bad data
+        TinyWire.write("Got bad data.");
+        return 1;
       }
+    } else {
+      // expecting more bytes
+      TinyWire.write("Got too few bytes.");
+      return 1;
     }
   }
   PORTB |= 0b101;
+  return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void onI2CRequest() {
+  // sends one byte with content 'b' to the master, regardless how many bytes he expects
+  // if the buffer is empty, but the master is still requesting, the slave aborts the communication
+  // (so it is not blocking)
+  TinyWire.send('b');
 }
 
 //////////////////////////////////////////////////////////////////////////////

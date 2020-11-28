@@ -22,7 +22,10 @@ bus = SMBus(1)
 ADDRESSES = [ 0x10 , 0x11 ]
 
 left_direction_last = True
-right_direction_last = True 
+right_direction_last = True
+left_power_last = 0
+right_power_last = 0
+
 
 def init_motors():
     # set direction to forward
@@ -72,10 +75,12 @@ def set_power(drive, turn):
   left_power = int(min(abs(left_power), 255))
   right_power = int(min(abs(right_power), 255))
   
-  send_i2c_data(ADDRESSES[0], [ ord('p'), left_power ] )
-  send_i2c_data(ADDRESSES[1], [ ord('p'), right_power ] )
+  if left_power != left_power_last:
+    send_i2c_data(ADDRESSES[0], [ ord('p'), left_power ] )
+  if right_power != right_power_last:
+    send_i2c_data(ADDRESSES[1], [ ord('p'), right_power ] )
 
-  return left_direction, right_direction
+  return left_direction, right_direction, left_power, right_power
 
 def constrain( _val, _min, _max):
   return min(_max, max(_min,_val))
@@ -111,8 +116,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     global left_direction_last
     global right_direction_last 
-
-    # print ('[WS] Incoming message:', message)
+    global left_power_last
+    global right_power_last
 
     message = message.split(',')
     # print ('[WS] Incoming message:', message)
@@ -120,30 +125,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     if message[0] == 'j':
       drive = float(message[1])
       turn = float(message[2])
-      left_direction_last, right_direction_last = set_power( drive , turn )
-
-    # Button Messages
-    # if message[0] == "on_g":
-    #     send_i2c_data(ADDRESSES[0], [ ord('b'), 255 ] )
-    #     send_i2c_data(ADDRESSES[1], [ ord('b'), 255 ] )
-    # if message[0] == "off_g":
-    #     send_i2c_data(ADDRESSES[0], [ ord('b'), 0 ] )
-    #     send_i2c_data(ADDRESSES[1], [ ord('b'), 0 ] )
-      
-    # if message == "on_r":
-    #   GPIO.output(18, True)
-    # if message == "off_r":
-    #   GPIO.output(18, False)
-      
-    # if message == 'on_b':
-    #   GPIO.output(11 , True)
-    # if message == 'off_b':
-    #   GPIO.output(11 , False)
-      
-    # if message == 'on_w':
-    #   GPIO.output(13 , True)
-    # if message == 'off_w':
-    #   GPIO.output(13 , False)
+      left_direction_last, right_direction_last, left_power_last, right_power_last = set_power( drive , turn )
 
 application = tornado.web.Application([
   (r'/', MainHandler),
