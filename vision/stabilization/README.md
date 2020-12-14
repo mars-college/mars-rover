@@ -1,4 +1,20 @@
+# MPU9250
+
+**Existing Arduino libraries offer quick calibration and Roll Pitch Yaw output.**
+
+Moving forward withe this module connected to an arduino (nano tested, attiny85 to be tested).
+
+* [A nice and simple library that works with Arduino Nano](https://github.com/hideakitai/MPU9250)
+* [Arduino Library from Sparkfun](https://github.com/sparkfun/SparkFun_MPU-9250-DMP_Arduino_Library)
+* [Code example of Quaternion to Euler Ange conversion](https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles)
+* [Python module for talking to the MPU9250](https://github.com/FaBoPlatform/FaBo9AXIS-MPU9250-Python/)
+* [Sensor Fusion Algorithm](https://github.com/adityanarayanan03/MPU9250/blob/master/source_code/sensorFusion.py) -- [repo](https://github.com/adityanarayanan03/MPU9250)
+
+---
+
 # MPU6050
+
+**NOTE: This sensor has serious drift issues and existing python libraries did not expose the digital motion processor functionality. Libraries for Arduino expose DMP functionality, but do not resolve the drift issues**
 
 These instructions are for setting up a RaspberryPi 4 B to use the [MPU6050](documents/MPU-6000-Datasheet1.pdf) 6-axis accelerometer and gyroscope. The breakout we're working with is the [HiLetgo GY-521](https://www.amazon.com/HiLetgo-MPU-6050-Accelerometer-Gyroscope-Converter/dp/B01DK83ZYQ) available on Amazon for \$5 a piece or \$9 for a pack of 3.
 
@@ -82,12 +98,16 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 * [MPU6050-I2C-Python-Class](https://github.com/thisisG/MPU6050-I2C-Python-Class)
 * [i2cdevlib/Arduino/MPU6050/](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050)
+* [Linux Driver?!?](https://elixir.bootlin.com/linux/latest/source/drivers/iio/imu/inv_mpu6050)
 
-## Obtaining Absolute Orientation
+## Learnding
 
+* [A review of basic IMU sensors that work with Arduino, and how to interface Arduino with the best sensor available.](https://maker.pro/arduino/tutorial/how-to-interface-arduino-and-the-mpu-6050-sensor)
+* [6 degrees of freedom MPU-6050](https://hackaday.io/project/19587-arduino-skillz/log/52443-6-degrees-of-freedom-mpu-6050)
 * [Arduino and MPU6050 Accelerometer and Gyroscope Tutorial](https://howtomechatronics.com/tutorials/arduino/arduino-and-mpu6050-accelerometer-and-gyroscope-tutorial/)
 * [Get Orientation with Arduino and MPU6050](https://www.teachmemicro.com/orientation-arduino-mpu6050/)
 * [MPU6050 - getting absolute pitch angle](https://forum.arduino.cc/index.php?topic=629154.0)
+* [Gravity Vector Maths](https://forum.arduino.cc/index.php?topic=447522.0)
 
 ## Alternative Sensors
 
@@ -125,7 +145,6 @@ FS_SEL	dps
 ```
 
 Example: `0x1B	000XX000` where `XX` is `0bFS_SEL` value
-### Use DMP
 
 ### Interrupts
 
@@ -143,3 +162,11 @@ Example: `0x38 00010001` Enables a FIFO buffer overflow to generate an interrupt
 * Register Address: `0x3A`
 
 Example: `0x3A 000X000Y` where `X` indicates `FIFO_OFLOW_INT` and `Y` indicates `DATA_RDY_INT`
+
+---
+
+# BNO055
+
+Adafruit... I kinda am beginning to not be so into their products because of the sprawling and seemingly patchy nature of their documentation... It also appears to require I2C clock stretching to work on the RaspberryPi, not even going to try to attempt this on the JetsonNano. Send it back
+
+* [Driver from Adafruit](https://github.com/adafruit/Adafruit_CircuitPython_BNO055/tree/a716040e9ffb08504502b5425d2692c990cef906)
