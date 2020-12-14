@@ -14,17 +14,30 @@ float r = 0.0;
 float p = 0.0;
 float y = 0.0;
 
+void sendStatus() {
+  Serial.print("{\"status\" : ");
+  Serial.print(isReady);
+  Serial.print(", \"roll\" : ");
+  Serial.print(r);
+  Serial.print(", \"pitch\" : ");
+  Serial.print(p);
+  Serial.print(", \"yaw\" : ");
+  Serial.print(y);
+  Serial.println("}");
+}
+
 void setup() {
   Serial.begin(115200);
   while (!Serial) {
     ; // wait for serial port to connect
   }
-
   Wire.begin();
+  sendStatus();
   mpu.setup(ADDRESS);
   mpu.calibrateAccelGyro();
   mpu.calibrateMag();
   isReady = true;
+  sendStatus();
 }
 
 void loop() {
@@ -39,15 +52,7 @@ void serialEvent() {
   while (Serial.available()) {
     String message = Serial.readStringUntil('\n');
     if (message.equals("fetch")) {
-      Serial.print("{\"status\" : ");
-      Serial.print(isReady);
-      Serial.print(", \"roll\" : ");
-      Serial.print(r);
-      Serial.print(", \"pitch\" : ");
-      Serial.print(p);
-      Serial.print(", \"yaw\" : ");
-      Serial.print(y);
-      Serial.println("}");
+      sendStatus();
     }
   }
 }
