@@ -27,6 +27,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
  
   def on_message(self, message):
     print ('[WS] Incoming message:', message)
+    pass
 
   def on_close(self):
     print ('[WS] Connection was closed.')

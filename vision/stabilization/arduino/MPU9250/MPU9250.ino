@@ -26,6 +26,15 @@ void sendStatus() {
   Serial.println("}");
 }
 
+void serialEvent() {
+  while (Serial.available()) {
+    String message = Serial.readStringUntil('\n');
+    if (message.equals("fetch")) {
+      sendStatus();
+    }
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   while (!Serial) {
@@ -45,14 +54,5 @@ void loop() {
     r = mpu.getRoll();
     p = mpu.getPitch();
     y = mpu.getYaw();
-  }
-}
-
-void serialEvent() {
-  while (Serial.available()) {
-    String message = Serial.readStringUntil('\n');
-    if (message.equals("fetch")) {
-      sendStatus();
-    }
   }
 }
