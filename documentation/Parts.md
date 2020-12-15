@@ -14,6 +14,8 @@ Let's keep things organized by individuals:
 
 * Jetson Nano
 * Ricoh Theta S
+* MPU9250
+* BNO055
 
 ## Sophia's Parts
 
@@ -105,6 +107,10 @@ Resources:
 ### ATTiny85
 
 * 2x [ATTiny85](https://www.mouser.com/productdetail/microchip-technology-atmel/attiny85-20pu?qs=8jWQYweyg6NCiiaOb5GI9Q%3D%3D)
+
+### Arduino Nano Clone
+
+* 1x [Mini Nano V3.0 ATmega328P Microcontroller Board with USB Cable for Arduino](https://www.amazon.com/FTCBlock-ATmega328P-Microcontroller-Board-Arduino/dp/B07H31FS8J/)
 
 ### Accelerometer & Gyroscope Modules
 

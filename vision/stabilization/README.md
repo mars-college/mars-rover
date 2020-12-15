@@ -2,7 +2,7 @@
 
 **Existing Arduino libraries offer quick calibration and Roll Pitch Yaw output.**
 
-Moving forward withe this module connected to an arduino (nano tested, attiny85 to be tested).
+Moving forward with this module connected to an arduino (nano tested, attiny85 to be tested).
 
 * [A nice and simple library that works with Arduino Nano](https://github.com/hideakitai/MPU9250)
 * [Arduino Library from Sparkfun](https://github.com/sparkfun/SparkFun_MPU-9250-DMP_Arduino_Library)
@@ -16,7 +16,7 @@ Moving forward withe this module connected to an arduino (nano tested, attiny85 
 
 **NOTE: This sensor has serious drift issues and existing python libraries did not expose the digital motion processor functionality. Libraries for Arduino expose DMP functionality, but do not resolve the drift issues**
 
-These instructions are for setting up a RaspberryPi 4 B to use the [MPU6050](documents/MPU-6000-Datasheet1.pdf) 6-axis accelerometer and gyroscope. The breakout we're working with is the [HiLetgo GY-521](https://www.amazon.com/HiLetgo-MPU-6050-Accelerometer-Gyroscope-Converter/dp/B01DK83ZYQ) available on Amazon for \$5 a piece or \$9 for a pack of 3.
+These instructions are for setting up a RaspberryPi 4 B to use the [MPU6050](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf) 6-axis accelerometer and gyroscope. The breakout we're working with is the [HiLetgo GY-521](https://www.amazon.com/HiLetgo-MPU-6050-Accelerometer-Gyroscope-Converter/dp/B01DK83ZYQ) available on Amazon for \$5 a piece or \$9 for a pack of 3.
 
 ![](images/gy-521-mp6050.jpg)
 
@@ -94,6 +94,8 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> sensor.get_gyro_data()
 {'x': 0.3511450381679389, 'y': 4.3816793893129775, 'z': -0.8091603053435115}
 ```
+Note: It may be possible to simply do some filtering on grabs from the FIFO to get Roll, Pitch, Yaw data. Haven't really investigated, but grabbing data off the registers may require some register programming. [Here's a reference for that](https://cdn.sparkfun.com/datasheets/Sensors/Accelerometers/RM-MPU-6000A.pdf) (spoiler... the DMP is not documented).
+
 ## Additional Code
 
 * [MPU6050-I2C-Python-Class](https://github.com/thisisG/MPU6050-I2C-Python-Class)
