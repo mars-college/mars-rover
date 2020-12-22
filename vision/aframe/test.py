@@ -1,22 +1,25 @@
+import time
+from PIL import Image
 import cv2
 import numpy as np
-import sys
-import pyautogui
-import time
-
-from av import VideoFrame
 import moderngl
-from PIL import Image
+
+# parameters / constants
+PI = 3.14159265358979
+cam1_radius = (1.0, 1.1)      # camera #1 multiply radius 
+cam2_radius = (1.0, 1.1)      # camera #2 multiply radius 
+cam1_margin = (0.107, 0.079)  # camera #1 trim sides
+cam2_margin = (0.081, 0.099)  # camera #2 trim sides
+width, height = 3264, 2464    # camera resolution
+fov = 200.0                   # camera field of view in degrees
 
 # setup camera
-width, height = 1280, 640
-idx = sys.argv[1]
-video_capture = cv2.VideoCapture(int(idx))
-#video_capture = cv2.VideoCapture("nvarguscamerasrc sensor_id=0 ! video/x-raw(memory:NVMM), width=(int)3264, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
+cam1 = cv2.VideoCapture("nvarguscamerasrc sensor_id=0 ! video/x-raw(memory:NVMM), width=(int)3264, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
+cam2 = cv2.VideoCapture("nvarguscamerasrc sensor_id=1 ! video/x-raw(memory:NVMM), width=(int)3264, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
 
 # setup gl
 vertices = np.array([-1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0], dtype='f4')
-ctx = moderngl.create_context(standalone=True)
+ctx = moderngl.create_context(standalone=True, backend='egl')
 fbo = ctx.simple_framebuffer((width, height), components=3)
 fbo.use()
 prog = ctx.program(
@@ -25,78 +28,75 @@ prog = ctx.program(
 )
 
 # set constants
-prog['FOV'].value = 3.14159265358979
-prog['CAMERA_COEFF'].value = 0.88175
+prog['FOV'].value = PI * fov / 180.0
+prog['cam1_radius'].value = cam1_radius
+prog['cam2_radius'].value = cam2_radius
+prog['cam1_margin'].value = cam1_margin
+prog['cam2_margin'].value = cam2_margin
+prog['yaw'].value = 0.0
+prog['pitch'].value = 0.0
+prog['roll'].value = 0.0
+prog['camTex1'].value = 0
+prog['camTex2'].value = 1
 
-# display
-#cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
-#cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+# setup textures
+tex1 = ctx.texture((width, height), components=3)
+tex2 = ctx.texture((width, height), components=3)
+tex1.use(prog['camTex1'].value)
+tex2.use(prog['camTex2'].value)
 
-import time
 
-frames = 0
-t_0 = time.time()
+vao = ctx.simple_vertex_array(prog, ctx.buffer(vertices), 'in_vert')
 
-time.sleep(1)
-ret, frame = video_capture.read()
+frame = np.empty((height, width, 3), dtype='u1')
+
+# for calculating FPS
+frame_count = 0
+t0 = time.time()
+
+# rotation parameters
+yaw = 0 
+pitch = 0
+roll = 0
+
 
 while True:
-    t0 = time.time()
 
-    ret, frame = video_capture.read()
-    if ret is False:
+    ret1, frame1 = cam1.read()
+    ret2, frame2 = cam2.read()
+
+    if not ret1 or not ret2:
         continue
+    
+    tex1.write(data=frame1)
+    tex2.write(data=frame2)
 
-    t1 = time.time()
+    yaw += 0.0072
+    pitch += 0.0065
+    roll += 0.0069
 
-    print('frame shape', frame.shape)
+    prog['yaw'].value = yaw
+    prog['pitch'].value = pitch
+    prog['roll'].value = roll
 
-    # set rotation uniforms with mouse    
-    x, y = pyautogui.position()[0], pyautogui.position()[1]    
-    prog['yaw'].value = float(x-800+00)/400.0
-    prog['pitch'].value = float(y-800+00)/500.0
-    prog['roll'].value = float(y-800+00)/600.0
-
-    t2 = time.time()
-
-    h, w = frame.shape[0:2]
-    tex = ctx.texture((w, h), 
-        components=3, 
-        data=frame.tobytes()
-    )
-
-    tex.use()
-    t3 = time.time()
     ctx.clear(1.0, 1.0, 1.0)
-    t4 = time.time()
-    vao = ctx.simple_vertex_array(prog, ctx.buffer(vertices), 'in_vert')
-    t5 = time.time()
     vao.render(mode=6)
+    fbo.read_into(frame, components=3)
 
-    t6 = time.time()
-
-    img_buf = Image.frombytes('RGB', (width, height), fbo.read(components=3))
-    # frame = cv2.resize(frame, (width, height))
-    frame = np.array(img_buf.convert('RGB'))
-    t7 = time.time()
-
-    if ret:
-        cv2.imshow('window', frame)
+    # display
+    disp_frame = np.array(Image.fromarray(frame.astype(np.uint8)).resize((1280, 720)))
+    cv2.imshow('window', disp_frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    t8 = time.time()
-    t_all = t8-t0
+    frame_count += 1
+    print('fps', frame_count / (time.time() - t0))
 
-    nframes+=1
-    fps = float(nframes)/(time.time()-t_0)
-
-    print('fps=%0.2f : %0.5f, %0.5f, %0.5f, %0.5f, %0.5f, %0.5f, %0.5f, %0.5f' % (fps, (t1-t0)/t_all, (t2-t1)/t_all, (t3-t2)/t_all, (t4-t3)/t_all, (t5-t4)/t_all, (t6-t5)/t_all, (t7-t6)/t_all, (t8-t7)/t_all))
-
-    # time.sleep(0.1)
-
-# Release handle to the webcam
-video_capture.release()
+# clean-up
+cam1.release()
+cam2.release()
+tex1.release()
+tex2.release()
 cv2.destroyAllWindows()
 
 

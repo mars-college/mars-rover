@@ -16,23 +16,42 @@ from aiohttp import web
 from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
 from aiortc.contrib.media import MediaPlayer
 
+PI = 3.14159265358979
 ROOT = os.path.dirname(__file__)
 pcs = set()
 
-
-# just for testing rotation params with mouse
-import pyautogui
-
+# camera parameters / constants
+cam1_radius = (1.0, 1.1)      # camera #1 multiply radius 
+cam2_radius = (1.0, 1.1)      # camera #2 multiply radius 
+cam1_margin = (0.107, 0.079)  # camera #1 trim sides
+cam2_margin = (0.081, 0.099)  # camera #2 trim sides
+width, height = 3264, 2464    # camera resolution
+output_size = (1920, 960)     # stream output size
+fov = 200.0                   # camera field of view in degrees
 
 
 class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
 
     def __init__(self, camera_id):
         super().__init__()
-        self.video, self.audio = True, False
-        self.cap = cv2.VideoCapture(camera_id)
-        self.width, self.height = 1280, 720
+        self.video = True 
+        self.audio = False
+        self.width = width
+        self.height = height
+        self.output_size = output_size
+        self.cap1 = cv2.VideoCapture("nvarguscamerasrc sensor_id=0 ! video/x-raw(memory:NVMM), width=(int)3264, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
+        self.cap2 = cv2.VideoCapture("nvarguscamerasrc sensor_id=1 ! video/x-raw(memory:NVMM), width=(int)3264, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
         self.setup_gl()
+
+
+    def exit(self):
+        # this is not called yet
+        self.cap1.release()
+        self.cap2.release()
+        self.tex1.release()
+        self.tex2.release()
+        cv2.destroyAllWindows()
+
 
     def setup_gl(self):
         if platform.system() == "Darwin":
@@ -59,37 +78,54 @@ class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
         )
 
         # set constants
-        self.prog['FOV'].value = 3.14159265358979
-        self.prog['CAMERA_COEFF'].value = 0.88175
+        self.prog['FOV'].value = PI * fov / 180.0
+        self.prog['cam1_radius'].value = cam1_radius
+        self.prog['cam2_radius'].value = cam2_radius
+        self.prog['cam1_margin'].value = cam1_margin
+        self.prog['cam2_margin'].value = cam2_margin
+        self.prog['yaw'].value = 0.0
+        self.prog['pitch'].value = 0.0
+        self.prog['roll'].value = 0.0
+        self.prog['camTex1'].value = 0
+        self.prog['camTex2'].value = 1
+
+        # setup textures
+        self.tex1 = self.ctx.texture((self.width, self.height), components=3)
+        self.tex2 = self.ctx.texture((self.width, self.height), components=3)
+        self.tex1.use(self.prog['camTex1'].value)
+        self.tex2.use(self.prog['camTex2'].value)
+
+        # setup vertex array and frame buffer
+        self.vao = self.ctx.simple_vertex_array(self.prog, self.ctx.buffer(self.vertices), 'in_vert')
+        self.frame = np.empty((self.height, self.width, 3), dtype='u1')
 
 
     async def recv(self):
         pts, time_base = await self.next_timestamp()
-        ret, frame = self.cap.read()
 
-        if not ret:
+        # read cameras
+        ret1, frame1 = self.cap1.read()
+        ret2, frame2 = self.cap2.read()
+
+        if not ret1 and not ret2:
             return
-    
-        self.tex = self.ctx.texture((
-            self.width, self.height), 
-            components=3, 
-            data=frame.tobytes()
-        )
 
-        x, y = pyautogui.position()[0], pyautogui.position()[1]
-        self.prog['yaw'].value = float(x-800+00)/400.0
-        self.prog['pitch'].value = float(y-800+00)/500.0
-        self.prog['roll'].value = float(y-800+00)/600.0
+        self.tex1.write(data=frame1)
+        self.tex2.write(data=frame2)
 
-        self.tex.use()
+        # update rotation parameters
+        self.prog['yaw'].value = 0.0
+        self.prog['pitch'].value = 0.0
+        self.prog['roll'].value = 0.0
+
+        # render
         self.ctx.clear(1.0, 1.0, 1.0)
-        self.vao = self.ctx.simple_vertex_array(self.prog, self.ctx.buffer(self.vertices), 'in_vert')
         self.vao.render(mode=6)
+        self.fbo.read_into(self.frame, components=3)
 
-        img_buf = Image.frombytes('RGB', (self.width, self.height), self.fbo.read(components=3))
-        image_out = np.array(img_buf.convert('RGB'))
-
-        new_frame = VideoFrame.from_ndarray(image_out, format="bgr24")
+        # output
+        final_frame = np.array(Image.fromarray(self.frame.astype(np.uint8)).resize(self.output_size))
+        new_frame = VideoFrame.from_ndarray(final_frame, format="bgr24")
         new_frame.pts = pts
         new_frame.time_base = time_base
 
