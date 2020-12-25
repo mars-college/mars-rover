@@ -97,7 +97,7 @@ int onI2CReceive() {
     }
   }
   
-  PORTB |= 0b101;
+  //PORTB |= 0b101;
   return 0;
 }
 
