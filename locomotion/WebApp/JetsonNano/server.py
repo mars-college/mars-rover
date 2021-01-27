@@ -18,9 +18,11 @@ settings = dict(
 # Tonado server port
 PORT = 80
 
+# i2c variables
 bus = SMBus(1)
 ADDRESSES = [ 0x10 , 0x11 ]
 
+# contrl variables
 left_direction_last = True
 right_direction_last = True
 left_power_last = 0
@@ -36,9 +38,10 @@ def init_motors():
     send_i2c_data( ADDRESSES[1], [ ord('p'), 0 ] )
 
 def set_power(drive, turn):
+  # NOTE: this is currently designed around a single joystick UI.
+  # May need to be tweaked for dual joystick gamepad controllers
 
-  # constrain drive and turn to -1.0 to 1.0
-  # scale by 256
+  # contrain and scale values to 
   drive = constrain( drive, -1.0 ,1.0) * 256
   turn = constrain( turn, -1.0 ,1.0) * 256
 
@@ -61,10 +64,9 @@ def set_power(drive, turn):
   else:
     right_direction = False
 
-  # send direction changes only 
-  # I2C spam suppression
+  # NOTE: commented out code to send direction changes only for I2C spam suppression
   # not sure if this is entirely necessary
-  # eliminate some redundancy
+  
   #if left_direction != left_direction_last:
   send_i2c_data( ADDRESSES[0], [ ord('d'), int(left_direction) ] )
 
@@ -141,7 +143,6 @@ if __name__ == "__main__":
 
         print ("Tornado Server started")
         main_loop.start()
-
     except Exception as e:
         # Just incase the motors didn't get the message to stop...
         set_power( 0.0, 0.0 )
