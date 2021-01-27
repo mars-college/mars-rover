@@ -55,11 +55,11 @@ $(document).ready(function(){
 
                 if (factor != 1 && factor > 0 ){
                     if ( value < 0 ){
-                        value = -(Math.pow(factor,Math.abs(value)) - 1) / (factor-1);
-                        // value = -Math.pow(Math.abs(value), factor);
+                        // value = -(Math.pow(factor,Math.abs(value)) - 1) / (factor-1);
+                        value = -Math.pow(Math.abs(value), factor);
                     } else {
-                        value = (Math.pow(factor,value) - 1) / (factor-1);
-                        // value = Math.pow(value, factor);
+                        // value = (Math.pow(factor,value) - 1) / (factor-1);
+                        value = Math.pow(value, factor);
                     }
                 }
             }

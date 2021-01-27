@@ -65,20 +65,20 @@ def set_power(drive, turn):
   # I2C spam suppression
   # not sure if this is entirely necessary
   # eliminate some redundancy
-  if left_direction != left_direction_last:
-    send_i2c_data( ADDRESSES[0], [ ord('d'), int(left_direction) ] )
+  #if left_direction != left_direction_last:
+  send_i2c_data( ADDRESSES[0], [ ord('d'), int(left_direction) ] )
 
-  if right_direction != right_direction_last:
-    send_i2c_data( ADDRESSES[1], [ ord('d'), int(right_direction) ] )
+  #if right_direction != right_direction_last:
+  send_i2c_data( ADDRESSES[1], [ ord('d'), int(right_direction) ] )
 
   # absolute value constrained to integer values 0-255
   left_power = int(min(abs(left_power), 255))
   right_power = int(min(abs(right_power), 255))
   
-  if left_power != left_power_last:
-    send_i2c_data(ADDRESSES[0], [ ord('p'), left_power ] )
-  if right_power != right_power_last:
-    send_i2c_data(ADDRESSES[1], [ ord('p'), right_power ] )
+  #if left_power != left_power_last:
+  send_i2c_data(ADDRESSES[0], [ ord('p'), left_power ] )
+  #if right_power != right_power_last:
+  send_i2c_data(ADDRESSES[1], [ ord('p'), right_power ] )
 
   return left_direction, right_direction, left_power, right_power
 
@@ -125,7 +125,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     if message[0] == 'j':
       drive = float(message[1])
       turn = float(message[2])
-      left_direction_last, right_direction_last, left_power_last, right_power_last = set_power( drive , turn )
+      #left_direction_last, right_direction_last, left_power_last, right_power_last = set_power( drive , turn )
+      set_power( drive , turn )
 
 application = tornado.web.Application([
   (r'/', MainHandler),

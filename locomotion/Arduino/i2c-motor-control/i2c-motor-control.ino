@@ -4,7 +4,7 @@
 
 #include <TinyWire.h>
 
-#define ADDRESS 0x10 // using 0x10 for left motor, 0x11 for right
+#define ADDRESS 0x11 // using 0x10 for left motor, 0x11 for right
 //#define ADDRESS 0x11 // using 0x10 for left motor, 0x11 for right
 
 #define PWM_PIN 1 // PB1 - 1 = DIP8 pin #6
@@ -79,14 +79,14 @@ int onI2CReceive() {
       
       if (data == 'p') {
         target_speed = TinyWire.read();
-        TinyWire.write(String("Got: ").concat(String(target_speed)));
+        TinyWire.send('0');
       } else if (data == 'd') {
         dir = TinyWire.read();
         setDirection( dir );
-        TinyWire.write(String("Got: ").concat(String(dir)));
+        TinyWire.send('0');
       } else {
         // bad data
-        TinyWire.write("Got bad data.");
+        TinyWire.send('1');
         return 1;
       }
       
@@ -96,8 +96,6 @@ int onI2CReceive() {
       return 1;
     }
   }
-  
-  //PORTB |= 0b101;
   return 0;
 }
 
