@@ -4,8 +4,9 @@
 
 #include <TinyWire.h>
 
-#define ADDRESS 0x11 // using 0x10 for left motor, 0x11 for right
-//#define ADDRESS 0x11 // using 0x10 for left motor, 0x11 for right
+// using 0x10 for left motor, 0x11 for right
+#define ADDRESS 0x10 
+//#define ADDRESS 0x11
 
 #define PWM_PIN 1 // PB1 - 1 = DIP8 pin #6
 #define IN1_PIN 3 // PB1 - 3 = DIP8 pin #2
@@ -55,6 +56,7 @@ void setup() {
 //////////////////////////////////////////////////////////////////////////////
 
 void loop() {
+    //silence is golden
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -102,9 +104,7 @@ int onI2CReceive() {
 //////////////////////////////////////////////////////////////////////////////
 
 void onI2CRequest() {
-  // sends one byte with content 'b' to the master, regardless how many bytes he expects
-  // if the buffer is empty, but the master is still requesting, the slave aborts the communication
-  // (so it is not blocking)
+  // non-blocking acknowlegement
   TinyWire.send('b');
 }
 
