@@ -4,26 +4,12 @@
     <meta charset="UTF-8"/>
     <meta name="description" content="Rover's vision">
     <title>Rover's vision</title>
-    <!-- <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script> -->
-    <script src="aframe.min.js"></script>
+    <!-- <script src="aframe.min.js"></script> -->
+
   </head>
 
   <body>
-    <a-scene>
-      <a-assets>
-        <audio id="audio" autoplay="true" crossOrigin="anonymous"></audio>
-        <video id="video" autoplay="true" crossOrigin="anonymous"></video>
-      </a-assets>
-      <a-videosphere src="#video" rotation="0 180 0"></a-videosphere>
-    </a-scene> 
-
-    <script src="client.js"></script>
-
-    <script>
-      var use_stun_server = true;
-      start_client(use_stun_server);
-      document.querySelector('#video').play();
-    </script>
-
+    <img id="liveImg">
+    <script type="module" src="client.js"></script>
   </body>
 </html>
