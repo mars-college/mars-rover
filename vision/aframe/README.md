@@ -1,32 +1,35 @@
-Vision demo
-=============
+# Telepresence Vision
+
+These instructions show how to install all the software for the vision demo on a [fresh install of Jetson Nano Dev Kit](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit), (after having flahsed `jetson-nano-jp45-sd-card-image.zip` onto the SD card).
+
+First, install base libraries
+
+    sudo apt update
+    sudo add-apt-repository ppa:jonathonf/ffmpeg-4
+    sudo apt upgrade
+    sudo apt install -y libavdevice-dev libavfilter-dev libx264-dev libopus-dev libvpx-dev pkg-config libsrtp2-dev libffi6 libffi-dev python3-pip ffmpeg
+    pip3 install --upgrade pip
+
+Most needed packages should install fine from pip. We'll install `moderngl` (to get its dependencies) but in the next section we have to reinstall it from source after some dependency changes.
+
+	python3 -m pip install --user aiohttp aiortc av opencv-python numpy Pillow moderngl
 
 
+Now uninstall moderngl, install glcontext from source (must be >=2.0, <3.0), then reinstall moderngl from source without dependencies.
+
+    python3 -m pip uninstall moderngl
+    python3 -m pip install https://github.com/moderngl/glcontext/archive/master.zip
+    python3 -m pip install --no-deps -I https://github.com/moderngl/moderngl/archive/master.zip
 
 
-Install base libraries
+If `av` (PyAV) is not working right, try to instead install it from source.
 
-    sudo apt install libavdevice-dev libavfilter-dev libx264-dev libopus-dev libvpx-dev pkg-config libsrtp2-dev ffmpeg
-    sudo -H pip3 install --upgrade pip
     export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
-
-Now installing python packages. `PyAV` needs to be installed from source.
-
     git clone https://github.com/PyAV-Org/PyAV
     cd PyAV
     python3 -m pip install --upgrade -r tests/requirements.txt
     ./scripts/build-deps
     make
-
-Most other packages should install fine from pip. We'll install `moderngl` (to get its dependencies) but in the next section we have to reinstall it from source after some dependency changes. First...
-
-    python3 -m pip3 install --user aiohttp aiortc opencv-python numpy Pillow moderngl
-
-Uninstall moderngl, install glcontext from source (must be >=2.0, <3.0), then reinstall moderngl from source without dependencies.
-
-    pip3 uninstall moderngl
-    pip3 install https://github.com/moderngl/glcontext/archive/master.zip
-    pip3 install --no-deps -I https://github.com/moderngl/moderngl/archive/master.zip
 
 Optional: install ngrok (if you plan to use it as the server tunnel)
 
