@@ -4,12 +4,17 @@
     <meta charset="UTF-8"/>
     <meta name="description" content="Rover's vision">
     <title>Rover's vision</title>
-    <!-- <script src="aframe.min.js"></script> -->
+    <script src="aframe.min.js"></script>
+
 
   </head>
 
   <body>
-    <img id="liveImg">
+    <a-scene antialias="true" inspector="" keyboard-shortcuts="" screenshot="" vr-mode-ui="" device-orientation-permission-ui="">
+      
+      <a-sky id="myImg" rotation="0 0 0"></a-sky>
+      </a-sphere>
+    <canvas class="a-canvas a-grab-cursor" data-aframe-canvas="true" width="1300" height="984"></canvas><div class="a-loader-title" style="display: none;">A-Frame - Image Textures</div><a-entity camera="" position="" wasd-controls="" rotation="" look-controls="" aframe-injected=""></a-entity><div class="a-enter-vr" aframe-injected=""><button class="a-enter-vr-button" title="Enter VR mode with a headset or fullscreen mode on a desktop. Visit https://webvr.rocks or https://webvr.info for more information." aframe-injected=""></button></div><div class="a-enter-ar a-hidden" aframe-injected=""><button class="a-enter-ar-button" title="Enter AR mode with a headset or handheld device. Visit https://webvr.rocks or https://webvr.info for more information." aframe-injected=""></button></div><div class="a-orientation-modal a-hidden" aframe-injected=""><button aframe-injected="">Exit VR</button></div><a-entity light="" data-aframe-default-light="" aframe-injected=""></a-entity><a-entity light="" position="" data-aframe-default-light="" aframe-injected=""></a-entity></a-scene>
     <script type="module" src="client.js"></script>
   </body>
 </html>

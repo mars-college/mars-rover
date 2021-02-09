@@ -7,6 +7,7 @@ import os
 import platform
 import ssl
 import io
+import base64
 
 from gstreamer import *
 import numpy as np
@@ -145,15 +146,15 @@ def thread_function(obj):
     print("START THREADED FUNCTION")
     with GstVideoSource(obj.command1) as pipeline1, GstVideoSource(obj.command2) as pipeline2:
         while True:
-            print('i got a frame 0')
+            #print('i got a frame 0')
             # read cameras
             buffer1 = pipeline1.pop()
             buffer2 = pipeline2.pop()
-            print('i got a frame 1')
+            #print('i got a frame 1')
             obj.frame1 = np.ascontiguousarray(buffer1.data[:,:,:3])
-            print('i got a frame 2')
+            #print('i got a frame 2')
             obj.frame2 = np.ascontiguousarray(buffer2.data[:,:,:3])
-            print('i got a frame 3')
+            #print('i got a frame 3')
             #print('got new frames', self.frame1.shape, self.frame2.shape)
             obj.new_frame = True
             print('i got a frame 4')
@@ -172,8 +173,9 @@ class ImageWebSocket(tornado.websocket.WebSocketHandler):
         im = Image.fromarray(player.recv())
         buf = io.BytesIO()
         im.save(buf, format='JPEG')
+        buf = base64.b64encode(buf.getvalue())
+        self.write_message(buf)
 
-        self.write_message(buf.getvalue(), binary=True)
     def on_close(self):
             ImageWebSocket.clients.remove(self)
             print("WebSocket closed from: " + self.request.remote_ip)
@@ -202,15 +204,16 @@ if __name__ == "__main__":
             #(r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'aframe.min.js'}),
         ])       
 
-    http_server = tornado.httpserver.HTTPServer(app, ssl_options = {
-    "certfile": args.cert_file,
-    "keyfile": args.key_file,
-})
+#    http_server = tornado.httpserver.HTTPServer(app, ssl_options = {
+#    "certfile": args.cert_file,
+#    "keyfile": args.key_file,
+#})
+    http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(args.port, address=args.host)
     thread = threading.Thread(target=thread_function, args=(player,))
     print("thread Started")
     thread.start()
-    print("Starting server: https://localhost:" + str(args.port) + "/")
+    print("Starting server: http://localhost:" + str(args.port) + "/")
 
     tornado.ioloop.IOLoop.current().start()
 
