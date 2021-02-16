@@ -1,76 +1,53 @@
-var pc = null;
 
-function negotiate() {
-    pc.addTransceiver('video', {direction: 'recvonly'});
-    pc.addTransceiver('audio', {direction: 'recvonly'});
-    return pc.createOffer().then(function(offer) {
-        return pc.setLocalDescription(offer);
-    }).then(function() {
-        // wait for ICE gathering to complete
-        return new Promise(function(resolve) {
-            if (pc.iceGatheringState === 'complete') {
-                resolve();
-            } else {
-                function checkState() {
-                    if (pc.iceGatheringState === 'complete') {
-                        pc.removeEventListener('icegatheringstatechange', checkState);
-                        resolve();
-                    }
-                }
-                pc.addEventListener('icegatheringstatechange', checkState);
-            }
-        });
-    }).then(function() {
-        var offer = pc.localDescription;
-        return fetch('/offer', {
-            body: JSON.stringify({
-                sdp: offer.sdp,
-                type: offer.type,
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'POST'
-        });
-    }).then(function(response) {
-        return response.json();
-    }).then(function(answer) {
-        return pc.setRemoteDescription(answer);
-    }).catch(function(e) {
-        alert(e);
-    });
+var img = document.getElementById("liveImg");
+
+var target_fps = 24;
+
+var request_start_time = performance.now();
+var start_time = performance.now();
+var time = 0;
+var request_time = 0;
+var time_smoothing = 0.9; // larger=more smoothing
+var request_time_smoothing = 0.2; // larger=more smoothing
+var target_time = 1000 / target_fps;
+
+var wsProtocol = (location.protocol === "https:") ? "wss://" : "ws://";
+
+var path = location.pathname;
+if(path.endsWith("index.html"))
+{
+    path = path.substring(0, path.length - "index.html".length);
+}
+if(!path.endsWith("/")) {
+    path = path + "/";
+}
+var ws = new WebSocket(wsProtocol + location.host + path + "websocket");
+ws.binaryType = 'arraybuffer';
+
+function requestImage() {
+    request_start_time = performance.now();
+    ws.send('more');
 }
 
-function start_client(use_stun) {
-    var config = {
-        sdpSemantics: 'unified-plan'
-    };
-    if (use_stun) {
-        config.iceServers = [{urls: ['stun:stun.l.google.com:19302']}];
-    }
-    pc = new RTCPeerConnection(config);
+ws.onopen = function() {
+    console.log("connection was established");
+    start_time = performance.now();
+    requestImage();
+};
 
-    // connect audio / video
-    pc.addEventListener('track', function(evt) {
-        if (evt.track.kind == 'video') {
-            console.log("received at vid");
-            var zzz = evt.streams[0];
-            console.log(zzz);
-            document.getElementById('video').srcObject = zzz;
-        } else {
-            console.log("received at aud ");
-            var zzz = evt.streams[0];
-            console.log(zzz);
-            document.getElementById('audio').srcObject = evt.streams[0];
-        }
-    });
+ws.onmessage = function(evt) {
+    // var blob  = new Blob([new Uint8Array(arrayBuffer)], {type: "image/jpeg"});
+    // var blobUrl = window.URL.createObjectURL(blob);
+    document.getElementById("myImg").setAttribute('material', 'src', `url(data:image/jpeg;base64,${evt.data})`);
+    var end_time = performance.now();
+    var current_time = end_time - start_time;
+    // smooth with moving average
+    time = (time * time_smoothing) + (current_time * (1.0 - time_smoothing));
+    start_time = end_time;
 
-    negotiate();
-}
-
-function stop() {
-    // close peer connection
-    setTimeout(function() {
-        pc.close();
-    }, 500);
-}
+    var current_request_time = performance.now() - request_start_time;
+    // smooth with moving average
+    request_time = (request_time * request_time_smoothing) + (current_request_time * (1.0 - request_time_smoothing));
+    var timeout = Math.max(0, target_time - request_time);
+    setTimeout(requestImage, timeout);
+};

@@ -1,20 +1,23 @@
 import argparse
 import asyncio
+import threading
 import json
 import logging
 import os
 import platform
 import ssl
+import io
+import base64
 
+from gstreamer import *
 import numpy as np
-from PIL import Image
-import cv2
-from av import VideoFrame
 import moderngl
+from PIL import Image
 
-from aiohttp import web
-from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
-from aiortc.contrib.media import MediaPlayer
+import tornado
+import tornado.ioloop
+import tornado.web
+import tornado.websocket
 
 PI = 3.14159265358979
 ROOT = os.path.dirname(__file__)
@@ -25,23 +28,33 @@ cam1_radius = (1.0, 1.1)      # camera #1 multiply radius
 cam2_radius = (1.0, 1.1)      # camera #2 multiply radius 
 cam1_margin = (0.107, 0.079)  # camera #1 trim sides
 cam2_margin = (0.081, 0.099)  # camera #2 trim sides
-width, height = 3264, 2464    # camera resolution
-output_size = (1920, 960)     # stream output size
+width, height = 2048, 1024    # camera resolution
+stream_width, stream_height = 3264, 2464
+output_size = (1632,1232)     # stream output size
+fps = 12
 fov = 200.0                   # camera field of view in degrees
 
-
-class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
+class DualFishEyeToEquirectangularStreamer():
 
     def __init__(self, camera_id):
         super().__init__()
         self.video = True 
         self.audio = False
+        self.stream_width = stream_width
+        self.stream_height = stream_height
         self.width = width
         self.height = height
+        self.fps = fps
         self.output_size = output_size
-        self.cap1 = cv2.VideoCapture("nvarguscamerasrc sensor_id=0 ! video/x-raw(memory:NVMM), width=(int)3264, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
-        self.cap2 = cv2.VideoCapture("nvarguscamerasrc sensor_id=1 ! video/x-raw(memory:NVMM), width=(int)3264, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv ! video/x-raw, format=(string)BGRx ! videoconvert !  appsink")
+        self.caps_filter = 'capsfilter caps=video/x-raw(memory:NVMM),format=NV12,width={},height={},framerate={}/1'.format(self.stream_width, self.stream_height, self.fps)
+        self.command1 = 'nvarguscamerasrc sensor_id=1  ! {} ! nvvidconv ! video/x-raw, format=RGBA ! videoscale ! video/x-raw, width={},height={} ! appsink emit-signals=True sync=false'.format( self.caps_filter, self.width, self.height)
+        self.command2 = 'nvarguscamerasrc sensor_id=0  ! {} ! nvvidconv ! video/x-raw, format=RGBA ! videoscale ! video/x-raw, width={},height={} ! appsink emit-signals=True sync=false'.format( self.caps_filter, self.width, self.height)
+        
+        self.new_frame = False     
         self.setup_gl()
+
+        self.frame1 = None
+        self.frame2 = None
 
 
     def exit(self):
@@ -50,7 +63,6 @@ class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
         self.cap2.release()
         self.tex1.release()
         self.tex2.release()
-        cv2.destroyAllWindows()
 
 
     def setup_gl(self):
@@ -100,18 +112,18 @@ class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
         self.frame = np.empty((self.height, self.width, 3), dtype='u1')
 
 
-    async def recv(self):
-        pts, time_base = await self.next_timestamp()
+    def recv(self):
+#        ret1, frame1 = self.cap1.read()
+#        ret2, frame2 = self.cap2.read()
 
-        # read cameras
-        ret1, frame1 = self.cap1.read()
-        ret2, frame2 = self.cap2.read()
+#        if not ret1 and not ret2:
+#            return
 
-        if not ret1 and not ret2:
-            return
+        print("lets do this")
+        print(self.frame1.shape, self.frame2.shape, self.frame1.dtype)
 
-        self.tex1.write(data=frame1)
-        self.tex2.write(data=frame2)
+        self.tex1.write(data=self.frame1)
+        self.tex2.write(data=self.frame2)
 
         # update rotation parameters
         self.prog['yaw'].value = 0.0
@@ -124,66 +136,49 @@ class DualFishEyeToEquirectangularStreamer(VideoStreamTrack):
         self.fbo.read_into(self.frame, components=3)
 
         # output
-        final_frame = np.array(Image.fromarray(self.frame.astype(np.uint8)).resize(self.output_size))
-        new_frame = VideoFrame.from_ndarray(final_frame, format="bgr24")
-        new_frame.pts = pts
-        new_frame.time_base = time_base
-
+        #final_frame = 
+        print("the type is", type(self.frame), self.frame.shape)
+        #new_frame = self.frame
+        new_frame = self.frame
         return new_frame
 
+def thread_function(obj):
+    print("START THREADED FUNCTION")
+    with GstVideoSource(obj.command1) as pipeline1, GstVideoSource(obj.command2) as pipeline2:
+        while True:
+            #print('i got a frame 0')
+            # read cameras
+            buffer1 = pipeline1.pop()
+            buffer2 = pipeline2.pop()
+            #print('i got a frame 1')
+            obj.frame1 = np.ascontiguousarray(buffer1.data[:,:,:3])
+            #print('i got a frame 2')
+            obj.frame2 = np.ascontiguousarray(buffer2.data[:,:,:3])
+            #print('i got a frame 3')
+            #print('got new frames', self.frame1.shape, self.frame2.shape)
+            obj.new_frame = True
+            print('i got a frame 4')
+        print("END LOOP")
+    print("END THREAD")
 
-async def index(request):
-    content = open(os.path.join(ROOT, "index.html"), "r").read()
-    return web.Response(content_type="text/html", text=content)
+class ImageWebSocket(tornado.websocket.WebSocketHandler):
 
-
-async def client_script(request):
-    content = open(os.path.join(ROOT, "client.js"), "r").read()
-    return web.Response(content_type="application/javascript", text=content)
-
-
-async def aframejs(request):
-    content = open(os.path.join(ROOT, "aframe.min.js"), "r").read()
-    return web.Response(content_type="application/javascript", text=content)
-
-
-async def offer(request):
-    params = await request.json()
-    offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
+    clients = set()
     
-    pc = RTCPeerConnection()
-    pcs.add(pc)
-            
-    @pc.on("iceconnectionstatechange")
-    async def on_iceconnectionstatechange():
-        if pc.iceConnectionState == "failed":
-            await pc.close()
-            pcs.discard(pc)
-            
-    player = DualFishEyeToEquirectangularStreamer(args.camera_id)
+    def open(self):
+        ImageWebSocket.clients.add(self)
+    def check_origin(self, origin):
+        return True
+    def on_message(self, message):
+        im = Image.fromarray(player.recv())
+        buf = io.BytesIO()
+        im.save(buf, format='JPEG')
+        buf = base64.b64encode(buf.getvalue())
+        self.write_message(buf)
 
-    await pc.setRemoteDescription(offer)
-    for t in pc.getTransceivers():
-        if t.kind == "audio" and player.audio:
-            pc.addTrack(player.audio)
-        elif t.kind == "video" and player.video:
-            pc.addTrack(player) #player.video
-    
-    answer = await pc.createAnswer()
-    await pc.setLocalDescription(answer)
-    
-    return web.Response(
-        content_type="application/json",
-        text=json.dumps(
-            {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
-        ),
-    )
-
-async def on_shutdown(app):
-    # close peer connections
-    coros = [pc.close() for pc in pcs]
-    await asyncio.gather(*coros)
-    pcs.clear()
+    def on_close(self):
+            ImageWebSocket.clients.remove(self)
+            print("WebSocket closed from: " + self.request.remote_ip)
 
 
 if __name__ == "__main__":
@@ -195,22 +190,31 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8080, help="Port for HTTP server (default: 8080)")
     parser.add_argument("--verbose", "-v", action="count")
     args = parser.parse_args()
+    player = DualFishEyeToEquirectangularStreamer(args.camera_id)
 
     if args.verbose:
         print('set logging')
         logging.basicConfig(level=logging.DEBUG)
 
-    if args.cert_file:
-        ssl_context = ssl.SSLContext()
-        ssl_context.load_cert_chain(args.cert_file, args.key_file)
-    else:
-        ssl_context = None
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    app = tornado.web.Application([
+            (r"/websocket", ImageWebSocket),
+            (r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'index.html'})
+            #(r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'client2.js'}),
+            #(r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'aframe.min.js'}),
+        ])       
 
-    app = web.Application()
-    app.on_shutdown.append(on_shutdown)
-    app.router.add_get("/", index)
-    app.router.add_get("/client.js", client_script)
-    app.router.add_get("/aframe.min.js", aframejs)    
-    app.router.add_post("/offer", offer)
-    
-    web.run_app(app, host=args.host, port=args.port, ssl_context=ssl_context)
+#    http_server = tornado.httpserver.HTTPServer(app, ssl_options = {
+#    "certfile": args.cert_file,
+#    "keyfile": args.key_file,
+#})
+    http_server = tornado.httpserver.HTTPServer(app)
+    http_server.listen(args.port, address=args.host)
+    thread = threading.Thread(target=thread_function, args=(player,))
+    print("thread Started")
+    thread.start()
+    print("Starting server: http://localhost:" + str(args.port) + "/")
+
+    tornado.ioloop.IOLoop.current().start()
+
+
