@@ -26,13 +26,13 @@ pcs = set()
 # camera parameters / constants
 cam1_radius = (1.0, 1.1)      # camera #1 multiply radius 
 cam2_radius = (1.0, 1.1)      # camera #2 multiply radius 
-cam1_margin = (0.107, 0.079)  # camera #1 trim sides
-cam2_margin = (0.081, 0.099)  # camera #2 trim sides
+cam1_margin = (0.075, 0.1)    # camera #1 trim sides
+cam2_margin = (0.09, 0.075)   # camera #2 trim sides
 width, height = 2048, 1024    # camera resolution
 stream_width, stream_height = 3264, 2464
-output_size = (1632,1232)     # stream output size
 fps = 12
 fov = 200.0                   # camera field of view in degrees
+
 
 class DualFishEyeToEquirectangularStreamer():
 
@@ -45,7 +45,6 @@ class DualFishEyeToEquirectangularStreamer():
         self.width = width
         self.height = height
         self.fps = fps
-        self.output_size = output_size
         self.caps_filter = 'capsfilter caps=video/x-raw(memory:NVMM),format=NV12,width={},height={},framerate={}/1'.format(self.stream_width, self.stream_height, self.fps)
         self.command1 = 'nvarguscamerasrc sensor_id=1  ! {} ! nvvidconv ! video/x-raw, format=RGBA ! videoscale ! video/x-raw, width={},height={} ! appsink emit-signals=True sync=false'.format( self.caps_filter, self.width, self.height)
         self.command2 = 'nvarguscamerasrc sensor_id=0  ! {} ! nvvidconv ! video/x-raw, format=RGBA ! videoscale ! video/x-raw, width={},height={} ! appsink emit-signals=True sync=false'.format( self.caps_filter, self.width, self.height)
@@ -59,8 +58,6 @@ class DualFishEyeToEquirectangularStreamer():
 
     def exit(self):
         # this is not called yet
-        self.cap1.release()
-        self.cap2.release()
         self.tex1.release()
         self.tex2.release()
 
@@ -113,53 +110,35 @@ class DualFishEyeToEquirectangularStreamer():
 
 
     def recv(self):
-#        ret1, frame1 = self.cap1.read()
-#        ret2, frame2 = self.cap2.read()
+        if self.new_frame:
+            self.tex1.write(data=self.frame1)
+            self.tex2.write(data=self.frame2)
 
-#        if not ret1 and not ret2:
-#            return
+            # update rotation parameters
+            self.prog['yaw'].value = 0.0
+            self.prog['pitch'].value = 0.0
+            self.prog['roll'].value = 0.0
 
-        print("lets do this")
-        print(self.frame1.shape, self.frame2.shape, self.frame1.dtype)
+            # render
+            self.ctx.clear(1.0, 1.0, 1.0)
+            self.vao.render(mode=6)
+            self.fbo.read_into(self.frame, components=3)
 
-        self.tex1.write(data=self.frame1)
-        self.tex2.write(data=self.frame2)
+            # output
+            self.new_frame = False
+            return self.frame
 
-        # update rotation parameters
-        self.prog['yaw'].value = 0.0
-        self.prog['pitch'].value = 0.0
-        self.prog['roll'].value = 0.0
-
-        # render
-        self.ctx.clear(1.0, 1.0, 1.0)
-        self.vao.render(mode=6)
-        self.fbo.read_into(self.frame, components=3)
-
-        # output
-        #final_frame = 
-        print("the type is", type(self.frame), self.frame.shape)
-        #new_frame = self.frame
-        new_frame = self.frame
-        return new_frame
 
 def thread_function(obj):
-    print("START THREADED FUNCTION")
     with GstVideoSource(obj.command1) as pipeline1, GstVideoSource(obj.command2) as pipeline2:
         while True:
-            #print('i got a frame 0')
             # read cameras
             buffer1 = pipeline1.pop()
             buffer2 = pipeline2.pop()
-            #print('i got a frame 1')
             obj.frame1 = np.ascontiguousarray(buffer1.data[:,:,:3])
-            #print('i got a frame 2')
             obj.frame2 = np.ascontiguousarray(buffer2.data[:,:,:3])
-            #print('i got a frame 3')
-            #print('got new frames', self.frame1.shape, self.frame2.shape)
             obj.new_frame = True
-            print('i got a frame 4')
-        print("END LOOP")
-    print("END THREAD")
+
 
 class ImageWebSocket(tornado.websocket.WebSocketHandler):
 
@@ -167,8 +146,10 @@ class ImageWebSocket(tornado.websocket.WebSocketHandler):
     
     def open(self):
         ImageWebSocket.clients.add(self)
+
     def check_origin(self, origin):
         return True
+
     def on_message(self, message):
         im = Image.fromarray(player.recv())
         buf = io.BytesIO()
@@ -177,8 +158,8 @@ class ImageWebSocket(tornado.websocket.WebSocketHandler):
         self.write_message(buf)
 
     def on_close(self):
-            ImageWebSocket.clients.remove(self)
-            print("WebSocket closed from: " + self.request.remote_ip)
+        ImageWebSocket.clients.remove(self)
+        print("WebSocket closed from: " + self.request.remote_ip)
 
 
 if __name__ == "__main__":
@@ -198,16 +179,17 @@ if __name__ == "__main__":
 
     script_path = os.path.dirname(os.path.realpath(__file__))
     app = tornado.web.Application([
-            (r"/websocket", ImageWebSocket),
-            (r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'index.html'})
-            #(r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'client2.js'}),
-            #(r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'aframe.min.js'}),
-        ])       
+        (r"/websocket", ImageWebSocket),
+        (r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'index.html'})
+        #(r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'client2.js'}),
+        #(r"/(.*)", tornado.web.StaticFileHandler, {'path': script_path, 'default_filename': 'aframe.min.js'}),
+    ])       
 
 #    http_server = tornado.httpserver.HTTPServer(app, ssl_options = {
 #    "certfile": args.cert_file,
 #    "keyfile": args.key_file,
 #})
+
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(args.port, address=args.host)
     thread = threading.Thread(target=thread_function, args=(player,))
