@@ -44,8 +44,8 @@ $(document).ready(function(){
 			// still needs some refining and scaling
 			drive = -gamepads[0].axes[1];
 			turn = gamepads[0].axes[2];
-			// var drive = deadzone(-gamepads[0].axes[1], 3);
-			// var turn = deadzone(gamepads[0].axes[2], 3);
+			// drive = deadzone(-gamepads[0].axes[1], 3);
+			// turn = deadzone(gamepads[0].axes[2], 3);
 			ws.send("j," + drive + "," + turn);
 		}
 
